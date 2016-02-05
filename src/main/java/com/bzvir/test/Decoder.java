@@ -2,7 +2,7 @@ package com.bzvir.test;
 
 import com.burtyka.cash.core.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.unsynchronized.jdeserialize;
+import org.unsynchronized.JDeserialize;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class Decoder {
         files.put("currencyManager.dat", CurrencyManager.class);
         files.put("transactionManager.dat", TransactionManager.class);
 
-		String filePath = "/home/bohdan/Test/25.01.2016-2/transactionManager.dat(new)";
+		String filePath = "/home/bohdan/Test/25.01.2016-2/transactionManager.dat";
 //		jDeserial(filePath);
 
 
@@ -64,7 +64,7 @@ public class Decoder {
 
 	private static void jDeserial(String filePath) {
 
-				jdeserialize jdeserialize =  new jdeserialize(filePath);
+				JDeserialize jdeserialize =  new JDeserialize(filePath);
 				
 				List<String> args2 = new ArrayList<String>();
 				args2.add(filePath);
