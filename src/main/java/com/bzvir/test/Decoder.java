@@ -1,6 +1,7 @@
 package com.bzvir.test;
 
 import com.burtyka.cash.core.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.unsynchronized.JDeserialize;
 
@@ -12,25 +13,27 @@ import java.util.Map;
 
 public class Decoder {
 
-	public static void main(String[] args) throws Exception {
-		String basePath = "/home/bogdan/Dropbox/Apps/Cash_backup/25.01.2016-2/";
-//		String basePath = "/home/bohdan/Test/25.01.2016-2/";
-        Map<String, Class> files = new HashMap<String, Class>();
-        files.put("settings.dat", Settings.class);
+    private static String dirPath = "/home/bohdan/Test/2016.01.25/";
+
+    private static Map<String, Class> files = new HashMap<String, Class>();
+    {   files.put("settings.dat", Settings.class);
         files.put("account.dat", Account.class);
         files.put("currencyManager.dat", CurrencyManager.class);
         files.put("transactionManager.dat", TransactionManager.class);
+    }
 
-		String filePath = "/home/bohdan/Test/25.01.2016-2/transactionManager.dat";
+    public static void main(String[] args) {
+        String filename = "settings.dat";
+		String filePath = dirPath + filename;
 //		jDeserial(filePath);
 
-
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filePath)));
-//		sett = (Settings) 
-//		account = (Account)
-//		currencyManager =		(CurrencyManager) 
-        TransactionManager transactionManager = (TransactionManager)
-				ois.readObject();
+        Class clazz = files.get(filename);
+        Object object = null;
+        try {
+            object = getValue(clazz, filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 //		transactionManager.setTransasctions(new ArrayList<Transaction>());
 
@@ -40,14 +43,26 @@ public class Decoder {
 //		out.writeObject(transactionManager);
 
         ObjectMapper mapper = new ObjectMapper();
-        String jsonInString = mapper.writeValueAsString(transactionManager);
+        String jsonInString = null;
+        try {
+            jsonInString = mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         System.out.println(jsonInString);
 //		getJson(transactionManager.getTransasctions());
 		
 //		System.out.println(transactionManager);
 	}
 
-	private static void getJson(List<Transaction> transasctions) throws IOException {
+
+    public static <T> T getValue(Class<T> clazz, String filePath) throws Exception{
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filePath)));
+        return clazz.cast(ois.readObject());
+    }
+
+
+    private static void getJson(List<Transaction> transasctions) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         for (Transaction transasction : transasctions) {
