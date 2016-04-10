@@ -1,6 +1,7 @@
 package com.bzvir.test;
 
 import com.burtyka.cash.core.*;
+import com.bzvir.report.ShortReporter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.unsynchronized.JDeserialize;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 public class Decoder {
 
-    private static String dirPath = "/home/bohdan/Test/2016.01.25/";
+    private static String dirPath = "/home/bohdan/Test/2016.04.10/";
 
     private static Map<Class, String> files = new HashMap<Class, String>();
     static {
@@ -31,12 +32,14 @@ public class Decoder {
         TransactionManager transactionManager = getValue(TransactionManager.class);
         CurrencyManager currencyManager = getValue(CurrencyManager.class);
 
-//		FileOutputStream fileOut =
-//				new FileOutputStream(filePath + "(new)");
-//		ObjectOutputStream out = new ObjectOutputStream(fileOut);
-//		out.writeObject(transactionManager);
+        new ShortReporter(account, transactionManager).doReport();
 
-        printJsonValue(transactionManager);
+            //		FileOutputStream fileOut =
+            //				new FileOutputStream(filePath + "(new)");
+            //		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            //		out.writeObject(transactionManager);
+
+//        printJsonValue(transactionManager);
 	}
 
     private static void printJsonValue(Object object) {

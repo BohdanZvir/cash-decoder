@@ -8,11 +8,11 @@ public class Account implements Serializable {
 
 	int accountDirection;
     int color;
-    java.util.ArrayList accountList;
+    java.util.List accountList;
     java.lang.String currencyId;
     java.lang.String description;
     java.lang.String id;
-    java.util.ArrayList items;
+    java.util.List<Account> items;
     java.lang.String name;
     
 	public int getAccountDirection() {
@@ -27,10 +27,10 @@ public class Account implements Serializable {
 	public void setColor(int color) {
 		this.color = color;
 	}
-	public java.util.ArrayList getAccountList() {
+	public java.util.List getAccountList() {
 		return accountList;
 	}
-	public void setAccountList(java.util.ArrayList accountList) {
+	public void setAccountList(java.util.List accountList) {
 		this.accountList = accountList;
 	}
 	public java.lang.String getCurrencyId() {
@@ -51,10 +51,10 @@ public class Account implements Serializable {
 	public void setId(java.lang.String id) {
 		this.id = id;
 	}
-	public java.util.ArrayList getItems() {
+	public java.util.List<Account> getItems() {
 		return items;
 	}
-	public void setItems(java.util.ArrayList items) {
+	public void setItems(java.util.List<Account> items) {
 		this.items = items;
 	}
 	public java.lang.String getName() {
