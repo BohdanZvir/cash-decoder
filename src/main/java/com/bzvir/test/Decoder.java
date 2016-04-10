@@ -15,33 +15,31 @@ public class Decoder {
 
     private static String dirPath = "/home/bohdan/Test/2016.01.25/";
 
-    private static Map<String, Class> files = new HashMap<String, Class>();
-    {   files.put("settings.dat", Settings.class);
-        files.put("account.dat", Account.class);
-        files.put("currencyManager.dat", CurrencyManager.class);
-        files.put("transactionManager.dat", TransactionManager.class);
+    private static Map<Class, String> files = new HashMap<Class, String>();
+    static {
+        files.put(Settings.class, "settings.dat");
+        files.put(Account.class, "account.dat");
+        files.put(CurrencyManager.class, "currencyManager.dat");
+        files.put(TransactionManager.class, "transactionManager.dat");
     }
 
     public static void main(String[] args) {
-        String filename = "settings.dat";
-		String filePath = dirPath + filename;
 //		jDeserial(filePath);
 
-        Class clazz = files.get(filename);
-        Object object = null;
-        try {
-            object = getValue(clazz, filePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-//		transactionManager.setTransasctions(new ArrayList<Transaction>());
+        Settings settings = getValue(Settings.class);
+        Account account = getValue(Account.class);
+        TransactionManager transactionManager = getValue(TransactionManager.class);
+        CurrencyManager currencyManager = getValue(CurrencyManager.class);
 
 //		FileOutputStream fileOut =
 //				new FileOutputStream(filePath + "(new)");
 //		ObjectOutputStream out = new ObjectOutputStream(fileOut);
 //		out.writeObject(transactionManager);
 
+        printJsonValue(transactionManager);
+	}
+
+    private static void printJsonValue(Object object) {
         ObjectMapper mapper = new ObjectMapper();
         String jsonInString = null;
         try {
@@ -50,17 +48,20 @@ public class Decoder {
             e.printStackTrace();
         }
         System.out.println(jsonInString);
-//		getJson(transactionManager.getTransasctions());
-		
-//		System.out.println(transactionManager);
-	}
-
-
-    public static <T> T getValue(Class<T> clazz, String filePath) throws Exception{
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filePath)));
-        return clazz.cast(ois.readObject());
     }
 
+
+    private static <T> T getValue(Class<T> clazz) {
+        String filename = files.get(clazz);
+        String filePath = dirPath + filename;
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filePath)));
+            return clazz.cast(ois.readObject());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     private static void getJson(List<Transaction> transasctions) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
