@@ -1,7 +1,7 @@
 package com.burtyka.cash.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class TransactionManager implements Serializable {
@@ -9,7 +9,7 @@ public class TransactionManager implements Serializable {
 	private static final long serialVersionUID = 3849840293350961550L;
 
 	java.util.Map transactionPositionsToAccounts;
-	java.util.ArrayList<Transaction> transasctions;
+	java.util.List<Transaction> transasctions;
 
     public Map getTransactionPositionsToAccounts() {
         return transactionPositionsToAccounts;
@@ -19,11 +19,11 @@ public class TransactionManager implements Serializable {
         this.transactionPositionsToAccounts = transactionPositionsToAccounts;
     }
 
-    public ArrayList<Transaction> getTransasctions() {
+    public List<Transaction> getTransasctions() {
         return transasctions;
     }
 
-    public void setTransasctions(ArrayList<Transaction> transasctions) {
+    public void setTransasctions(List<Transaction> transasctions) {
         this.transasctions = transasctions;
     }
 

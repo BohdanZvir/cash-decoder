@@ -40,6 +40,7 @@ public class Decoder {
             //		out.writeObject(transactionManager);
 
 //        printJsonValue(transactionManager);
+//        printJsonValue(account);
 	}
 
     private static void printJsonValue(Object object) {
@@ -90,9 +91,9 @@ public class Decoder {
 //				args2.add("-debug");
 //				args2.add("-showarrays");
 //				args2.add("-blockdata");
-//				args2.add("/home/bogdan/Java/Cash/blockdata.txt");
+//				args2.add("/home/bohdan/Java/Cash/blockdata.txt");
 //				args2.add("-blockdatamanifest");
-//				args2.add("/home/bogdan/Java/Cash/blockdatamanifest.txt");
+//				args2.add("/home/bohdan/Java/Cash/blockdatamanifest.txt");
 				jdeserialize.main(args2.toArray(new String[]{}));
 	}
 
