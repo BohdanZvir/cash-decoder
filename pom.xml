@@ -20,7 +20,14 @@
         <dependency>
             <groupId>org.unsynchronized</groupId>
             <artifactId>jdeserialize</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/jdeserialize-1.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>LATEST</version>
         </dependency>
     </dependencies>
 </project>
