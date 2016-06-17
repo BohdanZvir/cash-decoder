@@ -4,7 +4,7 @@ import com.burtyka.cash.core.*;
 import com.bzvir.report.ShortReporter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.unsynchronized.JDeserialize;
+import org.unsynchronized.jdeserialize;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -84,8 +84,8 @@ public class Decoder {
 
 	private static void jDeserial(String filePath) {
 
-				JDeserialize jdeserialize =  new JDeserialize(filePath);
-				
+                jdeserialize $jdeserialize =  new jdeserialize(filePath);
+
 				List<String> args2 = new ArrayList<String>();
 				args2.add(filePath);
 //				args2.add("-debug");
@@ -94,7 +94,7 @@ public class Decoder {
 //				args2.add("/home/bohdan/Java/Cash/blockdata.txt");
 //				args2.add("-blockdatamanifest");
 //				args2.add("/home/bohdan/Java/Cash/blockdatamanifest.txt");
-				jdeserialize.main(args2.toArray(new String[]{}));
+				$jdeserialize.main(args2.toArray(new String[]{}));
 	}
 
 }
