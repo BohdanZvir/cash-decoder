@@ -2,15 +2,30 @@ package com.bzvir.test;
 
 import org.abstractmeta.toolbox.compilation.compiler.JavaSourceCompiler;
 import org.abstractmeta.toolbox.compilation.compiler.impl.JavaSourceCompilerImpl;
+import org.unsynchronized.jdeserialize;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Created by bohdan on 19.06.16.
  */
 public class ClassGenerator {
 
-    public static String fixClassDeclaration(String textLine) {
+    public ClassGenerator(){
+        super();
+    }
+
+    public String getDirtyClassDeclaration(List<String> args) {
+        ConsoleOutputCapturer capturer = new ConsoleOutputCapturer();
+        capturer.start(false);
+        jdeserialize.main(args.toArray(new String[]{}));
+        String textLine = capturer.stop();
+
+        return fixClassDeclaration(textLine);
+    }
+
+    public String fixClassDeclaration(String textLine) {
         String[] lines = textLine.split(System.getProperty("line.separator"));
         String packageName = extractPackageName(lines[0]);
 
@@ -31,12 +46,12 @@ public class ClassGenerator {
         return sb.toString();
     }
 
-    public static String extractPackageName(String line) {
+    public String extractPackageName(String line) {
         String packageLine = line.split(" ")[1];
         return packageLine.substring(0, packageLine.lastIndexOf("."));
     }
 
-    public static Class loadClass(String sourceCode, String className) {
+    public Class loadClass(String sourceCode, String className) {
         JavaSourceCompiler javaSourceCompiler = new JavaSourceCompilerImpl();
         JavaSourceCompiler.CompilationUnit compilationUnit = javaSourceCompiler.createCompilationUnit();
         compilationUnit.addJavaSource(className, sourceCode);
