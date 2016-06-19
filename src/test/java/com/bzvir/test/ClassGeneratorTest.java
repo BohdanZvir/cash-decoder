@@ -3,13 +3,10 @@ package com.bzvir.test;
 /**
  * Created by bohdan on 19.06.16.
  */
-import org.abstractmeta.toolbox.compilation.compiler.JavaSourceCompiler;
-import org.abstractmeta.toolbox.compilation.compiler.impl.JavaSourceCompilerImpl;
-import org.junit.Test;
-import org.unsynchronized.jdeserialize;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -17,45 +14,31 @@ import static org.junit.Assert.*;
 public class ClassGeneratorTest {
 
     private static String testDirPath = System.getProperty("user.dir") + "/sample data/";
+    private ClassGenerator generator;
 
-    @Test
-    public void printDirtyClassDeclaration(){
-
-        List<String> args = new ArrayList<>();
-        args.add(testDirPath + "transactionManager.dat");
-        args.add("-nocontent");
-        args.add("-noinstances");
-        args.add("-filter");
-        args.add("java.util.*");
-
-        jdeserialize.main(args.toArray(new String[]{}));
+    @Before
+    public void setUp() throws Exception {
+        generator = new ClassGenerator();
     }
 
     @Test
     public void printEmptyClassDeclaration() {
 
-        List<String> args = new ArrayList<>();
+        List<String> args = ClassGenerator.getJdeserializeArgs();
         args.add(testDirPath + "transactionManager.dat");
-        args.add("-nocontent");
-        args.add("-noinstances");
-        args.add("-filter");
-        args.add("java.util.*");
 
-        ConsoleOutputCapturer capturer = new ConsoleOutputCapturer();
-        capturer.start(false);
-        jdeserialize.main(args.toArray(new String[]{}));
-        String textLine = capturer.stop();
-        textLine = ClassGenerator.fixClassDeclaration(textLine);
-        System.out.println(":: after capturing\n" + textLine);
+        String textLine = generator.getDirtyClassDeclaration(args);
+//        System.out.println(":: after capturing\n" + textLine);
         assertNotNull(textLine);
         assertFalse(textLine.isEmpty());
+        assertTrue(textLine.contains("class"));
     }
 
     @Test
     public void generateFullClassDeclaration() {
-        String str = "read: com.burtyka.cash.core.Account _h0x7e0003 = r_0x7e0000;  \n" +
+        String str = "read: com.burtyka.cash.core2.Account _h0x7e0003 = r_0x7e0000;  \n" +
                 "//// BEGIN class declarations (excluding array classes) (exclusion filter java.util.*)\n" +
-                "class com.burtyka.cash.core.Account implements java.io.Serializable {\n" +
+                "class com.burtyka.cash.core2.Account implements java.io.Serializable {\n" +
                 "    int accountDirection;\n" +
                 "    int color;\n" +
                 "    java.util.ArrayList accountList;\n" +
@@ -68,7 +51,7 @@ public class ClassGeneratorTest {
                 "\n" +
                 "//// END class declarations";
 
-        String fixedDeclaration = ClassGenerator.fixClassDeclaration(str);
+        String fixedDeclaration = generator.fixClassDeclaration(str);
         assertNotNull(fixedDeclaration);
         assertFalse(fixedDeclaration.contains("read:"));
         assertFalse(fixedDeclaration.contains("////"));
@@ -81,7 +64,7 @@ public class ClassGeneratorTest {
 
     @Test
     public void createClassFromText() {
-        String sourceCode = "package com.burtyka.cash.core;\n" +
+        String sourceCode = "package com.burtyka.cash.core2;\n" +
                 "\n" +
                 "@lombok.Getter\n" +
                 "@lombok.Setter\n" +
@@ -96,13 +79,23 @@ public class ClassGeneratorTest {
                 "    java.util.ArrayList items;\n" +
                 "    java.lang.String name;\n" +
                 "}";
-        String className = "com.burtyka.cash.core.Account2";
+        String className = "com.burtyka.cash.core2.Account2";
 
-        Class fooClass = ClassGenerator.loadClass(sourceCode, className);
+        Class fooClass = generator.loadClass(sourceCode);
         assertNotNull(fooClass);
         assertEquals(fooClass.getCanonicalName(), className);
         assertNotNull(fooClass.getDeclaredMethods());
         assertTrue(fooClass.getDeclaredMethods().length > 0);
     }
 
+    @Test
+    public void generateClassFullProcess() {
+
+        String file = "transactionManager.dat";
+        Class generateClass = generator.generateClass(testDirPath + file);
+        assertNotNull(generateClass);
+//        assertEquals(generateClass.getCanonicalName(), className);
+        assertNotNull(generateClass.getDeclaredMethods());
+        assertTrue(generateClass.getDeclaredMethods().length > 0);
+    }
 }

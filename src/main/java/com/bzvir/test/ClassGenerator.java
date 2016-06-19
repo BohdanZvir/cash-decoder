@@ -4,7 +4,7 @@ import org.abstractmeta.toolbox.compilation.compiler.JavaSourceCompiler;
 import org.abstractmeta.toolbox.compilation.compiler.impl.JavaSourceCompilerImpl;
 import org.unsynchronized.jdeserialize;
 
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +14,21 @@ public class ClassGenerator {
 
     public ClassGenerator(){
         super();
+    }
+
+    public static List<String> getJdeserializeArgs() {
+        List<String> args = new ArrayList<>();
+        args.add("-nocontent");
+        args.add("-noinstances");
+        args.add("-filter");
+        args.add("java.util.*");
+        return args;
+    }
+
+    public String getDirtyClassDeclaration(String dataFilePath) {
+        List<String> args = getJdeserializeArgs();
+        args.add(dataFilePath);
+        return getDirtyClassDeclaration(args);
     }
 
     public String getDirtyClassDeclaration(List<String> args) {
@@ -27,7 +42,9 @@ public class ClassGenerator {
 
     public String fixClassDeclaration(String textLine) {
         String[] lines = textLine.split(System.getProperty("line.separator"));
-        String packageName = extractPackageName(lines[0]);
+
+        String packageLine = lines[0].split(" ")[1];
+        String packageName = packageLine.substring(0, packageLine.lastIndexOf("."));
 
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(packageName).append(";\n");
@@ -46,16 +63,17 @@ public class ClassGenerator {
         return sb.toString();
     }
 
-    public String extractPackageName(String line) {
-        String packageLine = line.split(" ")[1];
-        return packageLine.substring(0, packageLine.lastIndexOf("."));
-    }
+    public Class loadClass(String sourceCode) {
+        JavaSourceCompiler sourceCompiler = new JavaSourceCompilerImpl();
+        JavaSourceCompiler.CompilationUnit compilationUnit = sourceCompiler.createCompilationUnit();
 
-    public Class loadClass(String sourceCode, String className) {
-        JavaSourceCompiler javaSourceCompiler = new JavaSourceCompilerImpl();
-        JavaSourceCompiler.CompilationUnit compilationUnit = javaSourceCompiler.createCompilationUnit();
+        String packageName = extractWord(sourceCode, "package", ';');
+        String className = extractWord(sourceCode, "class", ' ');
+
+        className = packageName + "." + className;
+
         compilationUnit.addJavaSource(className, sourceCode);
-        ClassLoader classLoader = javaSourceCompiler.compile(compilationUnit);
+        ClassLoader classLoader = sourceCompiler.compile(compilationUnit);
         Class fooClass = null;
         try {
             fooClass = classLoader.loadClass(className);
@@ -66,5 +84,16 @@ public class ClassGenerator {
             e.printStackTrace();
         }
         return fooClass;
+    }
+
+    private String extractWord(String text, String before, char splitter) {
+        int indexPackage = text.lastIndexOf(before) + before.length() + 1;
+        int indexSemiColon = text.indexOf(splitter, indexPackage);
+        return text.substring(indexPackage, indexSemiColon);
+    }
+
+    public Class generateClass(String dataFilePath) {
+        String classDeclaration = getDirtyClassDeclaration(dataFilePath);
+        return loadClass(classDeclaration);
     }
 }
