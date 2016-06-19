@@ -13,8 +13,7 @@ public class Settings implements Serializable {
 
 	private static final long serialVersionUID = 3340633318770345189L;
 
-
-	java.util.ArrayList barChartUnchecked;
+    java.util.ArrayList barChartUnchecked;
     com.dropbox.client2.session.AccessTokenPair dropBoxTokenPair;
     java.lang.Boolean fullScreenMode;
     java.lang.String language;
@@ -23,13 +22,5 @@ public class Settings implements Serializable {
     java.lang.Boolean passwordProtection;
     java.util.ArrayList pieChartUnchecked;
     java.lang.String screenOrientation;
-    
-	@Override
-	public String toString() {
-		return "Settings [barChartUnchecked=" + barChartUnchecked + ", dropBoxTokenPair=" + dropBoxTokenPair
-				+ ", fullScreenMode=" + fullScreenMode + ", language=" + language + ", mMoneyFormat=" + mMoneyFormat
-				+ ", mTheme=" + mTheme + ", passwordProtection=" + passwordProtection + ", pieChartUnchecked="
-				+ pieChartUnchecked + ", screenOrientation=" + screenOrientation + "]";
-	}
 
 }
