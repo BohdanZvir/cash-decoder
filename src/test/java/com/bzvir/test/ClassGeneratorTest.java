@@ -3,16 +3,16 @@ package com.bzvir.test;
 /**
  * Created by bohdan on 19.06.16.
  */
-import org.junit.Before;
+import org.abstractmeta.toolbox.compilation.compiler.JavaSourceCompiler;
+import org.abstractmeta.toolbox.compilation.compiler.impl.JavaSourceCompilerImpl;
 import org.junit.Test;
 import org.unsynchronized.jdeserialize;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ClassGeneratorTest {
 
@@ -46,7 +46,7 @@ public class ClassGeneratorTest {
         jdeserialize.main(args.toArray(new String[]{}));
         String textLine = capturer.stop();
         textLine = ClassGenerator.fixClassDeclaration(textLine);
-        System.out.println(textLine);
+        System.out.println(":: after capturing\n" + textLine);
         assertNotNull(textLine);
         assertFalse(textLine.isEmpty());
     }
@@ -77,6 +77,32 @@ public class ClassGeneratorTest {
         String className = fixedDeclaration.substring(classIndex + 6, spaceIndex);
         assertFalse(className.contains("."));
         assertTrue(Character.isUpperCase(className.charAt(0)));
+    }
+
+    @Test
+    public void createClassFromText() {
+        String sourceCode = "package com.burtyka.cash.core;\n" +
+                "\n" +
+                "@lombok.Getter\n" +
+                "@lombok.Setter\n" +
+                "@lombok.ToString\n" +
+                "class Account2 implements java.io.Serializable {\n" +
+                "    int accountDirection;\n" +
+                "    int color;\n" +
+                "    java.util.ArrayList accountList;\n" +
+                "    java.lang.String currencyId;\n" +
+                "    java.lang.String description;\n" +
+                "    java.lang.String id;\n" +
+                "    java.util.ArrayList items;\n" +
+                "    java.lang.String name;\n" +
+                "}";
+        String className = "com.burtyka.cash.core.Account2";
+
+        Class fooClass = ClassGenerator.loadClass(sourceCode, className);
+        assertNotNull(fooClass);
+        assertEquals(fooClass.getCanonicalName(), className);
+        assertNotNull(fooClass.getDeclaredMethods());
+        assertTrue(fooClass.getDeclaredMethods().length > 0);
     }
 
 }

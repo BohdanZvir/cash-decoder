@@ -1,5 +1,10 @@
 package com.bzvir.test;
 
+import org.abstractmeta.toolbox.compilation.compiler.JavaSourceCompiler;
+import org.abstractmeta.toolbox.compilation.compiler.impl.JavaSourceCompilerImpl;
+
+import java.lang.reflect.Method;
+
 /**
  * Created by bohdan on 19.06.16.
  */
@@ -29,5 +34,22 @@ public class ClassGenerator {
     public static String extractPackageName(String line) {
         String packageLine = line.split(" ")[1];
         return packageLine.substring(0, packageLine.lastIndexOf("."));
+    }
+
+    public static Class loadClass(String sourceCode, String className) {
+        JavaSourceCompiler javaSourceCompiler = new JavaSourceCompilerImpl();
+        JavaSourceCompiler.CompilationUnit compilationUnit = javaSourceCompiler.createCompilationUnit();
+        compilationUnit.addJavaSource(className, sourceCode);
+        ClassLoader classLoader = javaSourceCompiler.compile(compilationUnit);
+        Class fooClass = null;
+        try {
+            fooClass = classLoader.loadClass(className);
+//            for(Method method : fooClass.getDeclaredMethods()) {
+//                System.out.println(method);
+//            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return fooClass;
     }
 }
