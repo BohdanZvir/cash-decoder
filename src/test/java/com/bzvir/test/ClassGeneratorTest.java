@@ -36,9 +36,9 @@ public class ClassGeneratorTest {
 
     @Test
     public void generateFullClassDeclaration() {
-        String str = "read: com.burtyka.cash.core2.Account _h0x7e0003 = r_0x7e0000;  \n" +
+        String str = "read: com.burtyka.cash.core.Account _h0x7e0003 = r_0x7e0000;  \n" +
                 "//// BEGIN class declarations (excluding array classes) (exclusion filter java.util.*)\n" +
-                "class com.burtyka.cash.core2.Account implements java.io.Serializable {\n" +
+                "class com.burtyka.cash.core.Account implements java.io.Serializable {\n" +
                 "    int accountDirection;\n" +
                 "    int color;\n" +
                 "    java.util.ArrayList accountList;\n" +
@@ -64,7 +64,7 @@ public class ClassGeneratorTest {
 
     @Test
     public void createClassFromText() {
-        String sourceCode = "package com.burtyka.cash.core2;\n" +
+        String sourceCode = "package com.burtyka.cash.core;\n" +
                 "\n" +
                 "@lombok.Getter\n" +
                 "@lombok.Setter\n" +
@@ -79,7 +79,7 @@ public class ClassGeneratorTest {
                 "    java.util.ArrayList items;\n" +
                 "    java.lang.String name;\n" +
                 "}";
-        String className = "com.burtyka.cash.core2.Account2";
+        String className = "com.burtyka.cash.core.Account2";
 
         Class fooClass = generator.loadClass(sourceCode);
         assertNotNull(fooClass);
