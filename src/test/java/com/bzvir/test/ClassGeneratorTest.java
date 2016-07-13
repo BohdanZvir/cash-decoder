@@ -5,33 +5,47 @@ package com.bzvir.test;
  */
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.List;
+import java.util.ResourceBundle;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 public class ClassGeneratorTest {
 
-    private static String testDirPath = System.getProperty("user.dir") + "/sample data/";
+    private static String testDirPath;
     private ClassGenerator generator;
+    private String sampleFile;
+    private static ResourceBundle RESOURCE_BUNDLE;
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        RESOURCE_BUNDLE = ResourceBundle.getBundle("application");
+    }
 
     @Before
     public void setUp() throws Exception {
         generator = new ClassGenerator();
+        String sampleDir = RESOURCE_BUNDLE.getString("sample.dir");
+        testDirPath = System.getProperty("user.dir") + sampleDir;
+        sampleFile = testDirPath + "transactionManager.dat";
     }
 
     @Test
     public void printEmptyClassDeclaration() {
 
         List<String> args = ClassGenerator.getJdeserializeArgs();
-        args.add(testDirPath + "transactionManager.dat");
+        args.add(sampleFile);
 
-        String textLine = generator.getDirtyClassDeclaration(args);
-//        System.out.println(":: after capturing\n" + textLine);
-        assertNotNull(textLine);
-        assertFalse(textLine.isEmpty());
-        assertTrue(textLine.contains("class"));
+        String textLine = generator.getDirtyClassDeclarations(args);
+        List<String> strings = generator.fixClassDeclaration(textLine);
+        System.out.println(":: after capturing\n" + strings);
+
+        assertTrue(strings.get(0).contains("class"));
     }
 
     @Test
@@ -51,15 +65,18 @@ public class ClassGeneratorTest {
                 "\n" +
                 "//// END class declarations";
 
-        String fixedDeclaration = generator.fixClassDeclaration(str);
-        assertNotNull(fixedDeclaration);
-        assertFalse(fixedDeclaration.contains("read:"));
-        assertFalse(fixedDeclaration.contains("////"));
-        int classIndex = fixedDeclaration.indexOf("class");
-        int spaceIndex = fixedDeclaration.indexOf(' ', classIndex + 6);
-        String className = fixedDeclaration.substring(classIndex + 6, spaceIndex);
-        assertFalse(className.contains("."));
+        List<String> fixedDeclaration = generator.fixClassDeclaration(str);
+        String fixed = fixedDeclaration.get(0);
+        assertThat(fixed, not(containsString("read:")));
+        assertThat(fixed, not(containsString("////")));
+
+        int classIndex = fixed.indexOf("class");
+        int spaceIndex = fixed.indexOf(' ', classIndex + 6);
+        String className = fixed.substring(classIndex + 6, spaceIndex);
+
+        assertThat(className, not(containsString(".")));
         assertTrue(Character.isUpperCase(className.charAt(0)));
+        System.out.println(fixedDeclaration);
     }
 
     @Test
@@ -82,20 +99,23 @@ public class ClassGeneratorTest {
         String className = "com.burtyka.cash.core.Account2";
 
         Class fooClass = generator.loadClass(sourceCode);
-        assertNotNull(fooClass);
+
         assertEquals(fooClass.getCanonicalName(), className);
-        assertNotNull(fooClass.getDeclaredMethods());
-        assertTrue(fooClass.getDeclaredMethods().length > 0);
+        assertThat(fooClass.getDeclaredMethods().length, not(equalTo(0)));
     }
 
     @Test
-    public void generateClassFullProcess() {
+    public void generateClassFileWithPackageDirStructure() {
+        String path = (RESOURCE_BUNDLE.containsKey("constructed.classes.package")) ?
+                RESOURCE_BUNDLE.getString("constructed.classes.package")
+                : System.getProperty("user.dir") + "/src/main/java";
+        File pathToSave = new File(path);
 
-        String file = "transactionManager.dat";
-        Class generateClass = generator.generateClass(testDirPath + file);
-        assertNotNull(generateClass);
-//        assertEquals(generateClass.getCanonicalName(), className);
-        assertNotNull(generateClass.getDeclaredMethods());
-        assertTrue(generateClass.getDeclaredMethods().length > 0);
+        List<String> canonicalName = generator.constructClasses(sampleFile, pathToSave);
+
+        List<String> paths = generator.convertCanonicalClassNames(path, canonicalName);
+
+        assertThat(paths.size(), equalTo(canonicalName.size()));
     }
+
 }
