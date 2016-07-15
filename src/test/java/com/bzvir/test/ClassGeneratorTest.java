@@ -4,11 +4,13 @@ package com.bzvir.test;
  * Created by bohdan on 19.06.16.
  */
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -21,6 +23,8 @@ public class ClassGeneratorTest {
     private ClassGenerator generator;
     private String sampleFile;
     private static ResourceBundle RESOURCE_BUNDLE;
+    private File pathToSave;
+    private List<File> created = new ArrayList<>();
 
     @BeforeClass
     public static void setUpBeforeClass() {
@@ -33,15 +37,21 @@ public class ClassGeneratorTest {
         String sampleDir = RESOURCE_BUNDLE.getString("sample.dir");
         testDirPath = System.getProperty("user.dir") + sampleDir;
         sampleFile = testDirPath + "transactionManager.dat";
+        String path = (RESOURCE_BUNDLE.containsKey("constructed.classes.package"))
+                ? RESOURCE_BUNDLE.getString("constructed.classes.package")
+                : System.getProperty("user.dir") + "/src/main/java";
+        pathToSave = new File(path);
+    }
+
+    @After
+    public void tearDown() {
+        created.stream().forEach(File::deleteOnExit);
+        created.clear();
     }
 
     @Test
     public void printEmptyClassDeclaration() {
-
-        List<String> args = ClassGenerator.getJdeserializeArgs();
-        args.add(sampleFile);
-
-        String textLine = generator.readClassDeclarations(args);
+        String textLine = generator.readClassDeclarations(sampleFile);
         List<String> strings = generator.getClassDeclaration(textLine);
         System.out.println(":: after capturing\n" + strings);
 
@@ -77,9 +87,9 @@ public class ClassGeneratorTest {
         assertThat(fixed, not(containsString("read:")));
         assertThat(fixed, not(containsString("////")));
 
-        int classIndex = fixed.indexOf("class");
-        int spaceIndex = fixed.indexOf(' ', classIndex + 6);
-        String className = fixed.substring(classIndex + 6, spaceIndex);
+        int classIndex = fixed.indexOf("class") + "class ".length();
+        int spaceIndex = fixed.indexOf(' ', classIndex);
+        String className = fixed.substring(classIndex, spaceIndex);
 
         assertThat(className, not(containsString(".")));
         assertTrue(Character.isUpperCase(className.charAt(0)));
@@ -88,16 +98,10 @@ public class ClassGeneratorTest {
 
     @Test
     public void generateClassFileWithPackageDirStructure() {
-        String path = (RESOURCE_BUNDLE.containsKey("constructed.classes.package")) ?
-                RESOURCE_BUNDLE.getString("constructed.classes.package")
-                : System.getProperty("user.dir") + "/src/main/java";
-        File pathToSave = new File(path);
+        List<File> constructed = generator.constructClasses(sampleFile, pathToSave);
+        created.addAll(constructed);
 
-        List<String> canonicalName = generator.constructClasses(sampleFile, pathToSave);
-
-        List<String> paths = generator.convertCanonicalClassNames(path, canonicalName);
-
-        assertThat(paths.size(), equalTo(canonicalName.size()));
+        assertThat(constructed, hasItem(isA(File.class)));
     }
 
 }

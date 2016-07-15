@@ -3,8 +3,6 @@ package com.bzvir.test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
-import org.abstractmeta.toolbox.compilation.compiler.JavaSourceCompiler;
-import org.abstractmeta.toolbox.compilation.compiler.impl.JavaSourceCompilerImpl;
 import org.unsynchronized.jdeserialize;
 
 import java.io.File;
@@ -41,7 +39,7 @@ public class ClassGenerator {
         return readClassDeclarations(args);
     }
 
-    public String readClassDeclarations(List<String> args) {
+    private String readClassDeclarations(List<String> args) {
         ConsoleOutputCapturer capturer = new ConsoleOutputCapturer();
         boolean alsoWriteIntoConsole = false;
         capturer.start(alsoWriteIntoConsole);
@@ -62,7 +60,8 @@ public class ClassGenerator {
     }
 
     private String cleanDeclarations(String[] lines, String delimiter) {
-        String packageName = extractPackageName(lines[0].split(" ")[1]);
+        String canonicalName = lines[0].split(" ")[1];
+        String packageName = extractPackageName(canonicalName);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i < lines.length; i++) {
@@ -107,34 +106,30 @@ public class ClassGenerator {
         return getClassDeclaration(dirtyClassDeclarations);
     }
 
-    public List<String> constructClasses(String sampleFile, File pathToSave) {
+    public List<File> constructClasses(String sampleFile, File pathToSave) {
         List<String> classes = generateClassDeclarations(sampleFile);
         return classes.stream()
                 .map((s -> constructClass(s, pathToSave)))
-                .filter(s -> s.isEmpty())
+                .filter(s -> s != null)
                 .collect(Collectors.toList());
     }
 
-    private String constructClass(String sourceCode, File pathToSave) {
+    private File constructClass(String sourceCode, File pathToSave) {
         String packageName = extractWord(sourceCode, "package", ';');
         String className = extractWord(sourceCode, "class", ' ');
 
         String packagePath = packageName.replaceAll("\\.", File.separator);
         File file = new File(pathToSave, packagePath);
         file.mkdirs();
+        File created = new File(file, className + ".java");
         try {
-            Files.write(sourceCode, new File(file, className + ".java"), Charsets.UTF_8);
+            Files.write(sourceCode, created, Charsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
-            return "";
+            return null;
         }
-        return Joiner.on(".").join(packageName, className, "java");
+//        Joiner.on(".").join(packageName, className, "java");
+        return created;
     }
 
-    public List<String> convertCanonicalClassNames(String path, List<String> canonicalName) {
-        return canonicalName.stream()
-                    .map(s -> s.replace(".", path + File.separator + ".java"))
-                    .filter(s -> new File(s).exists())
-                    .collect(Collectors.toList());
-    }
 }
