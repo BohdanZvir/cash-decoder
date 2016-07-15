@@ -87,31 +87,6 @@ public class ClassGeneratorTest {
     }
 
     @Test
-    public void createClassFromText() {
-        String sourceCode = "package com.burtyka.cash.core;\n" +
-                "\n" +
-                "@lombok.Getter\n" +
-                "@lombok.Setter\n" +
-                "@lombok.ToString\n" +
-                "public class Account2 implements java.io.Serializable {\n" +
-                "    int accountDirection;\n" +
-                "    int color;\n" +
-                "    java.util.ArrayList accountList;\n" +
-                "    java.lang.String currencyId;\n" +
-                "    java.lang.String description;\n" +
-                "    java.lang.String id;\n" +
-                "    java.util.ArrayList items;\n" +
-                "    java.lang.String name;\n" +
-                "}";
-        String className = "com.burtyka.cash.core.Account2";
-
-        Class fooClass = generator.loadClass(sourceCode);
-
-        assertEquals(fooClass.getCanonicalName(), className);
-        assertThat(fooClass.getDeclaredMethods().length, not(equalTo(0)));
-    }
-
-    @Test
     public void generateClassFileWithPackageDirStructure() {
         String path = (RESOURCE_BUNDLE.containsKey("constructed.classes.package")) ?
                 RESOURCE_BUNDLE.getString("constructed.classes.package")

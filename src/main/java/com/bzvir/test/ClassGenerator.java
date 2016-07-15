@@ -94,31 +94,7 @@ public class ClassGenerator {
                 .collect(Collectors.toList());
     }
 
-    public List<Class> loadClass(List<String> declarations) {
-        return declarations.stream().map(s -> loadClass(s)).collect(Collectors.toList());
-    }
-
-    public Class loadClass(String sourceCode) {
-        JavaSourceCompiler sourceCompiler = new JavaSourceCompilerImpl();
-        JavaSourceCompiler.CompilationUnit compilationUnit = sourceCompiler.createCompilationUnit();
-
-        String packageName = extractWord(sourceCode, "package", ';');
-        String className = extractWord(sourceCode, "class", ' ');
-
-        className = packageName + "." + className;
-
-        compilationUnit.addJavaSource(className, sourceCode);
-        ClassLoader classLoader = sourceCompiler.compile(compilationUnit);
-        Class fooClass = null;
-        try {
-            fooClass = classLoader.loadClass(className);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return fooClass;
-    }
-
-    public String extractWord(String text, String beforeWord, char splitter) {
+    public static String extractWord(String text, String beforeWord, char splitter) {
         int wordIndex = (!beforeWord.isEmpty())
                 ? text.lastIndexOf(beforeWord) + beforeWord.length() + 1
                 : 0;
