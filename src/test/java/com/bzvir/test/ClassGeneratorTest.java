@@ -41,11 +41,18 @@ public class ClassGeneratorTest {
         List<String> args = ClassGenerator.getJdeserializeArgs();
         args.add(sampleFile);
 
-        String textLine = generator.getDirtyClassDeclarations(args);
-        List<String> strings = generator.fixClassDeclaration(textLine);
+        String textLine = generator.readClassDeclarations(args);
+        List<String> strings = generator.getClassDeclaration(textLine);
         System.out.println(":: after capturing\n" + strings);
 
         assertTrue(strings.get(0).contains("class"));
+    }
+
+    @Test
+    public void extractPackageName() {
+        String str = "read: com.burtyka.cash.core.TransactionManager _h0x7e0003 = r_0x7e0000;  \n";
+        String actual = generator.extractPackageName(str);
+        assertThat(actual, equalTo("com.burtyka.cash.core"));
     }
 
     @Test
@@ -65,7 +72,7 @@ public class ClassGeneratorTest {
                 "\n" +
                 "//// END class declarations";
 
-        List<String> fixedDeclaration = generator.fixClassDeclaration(str);
+        List<String> fixedDeclaration = generator.getClassDeclaration(str);
         String fixed = fixedDeclaration.get(0);
         assertThat(fixed, not(containsString("read:")));
         assertThat(fixed, not(containsString("////")));
@@ -86,7 +93,7 @@ public class ClassGeneratorTest {
                 "@lombok.Getter\n" +
                 "@lombok.Setter\n" +
                 "@lombok.ToString\n" +
-                "class Account2 implements java.io.Serializable {\n" +
+                "public class Account2 implements java.io.Serializable {\n" +
                 "    int accountDirection;\n" +
                 "    int color;\n" +
                 "    java.util.ArrayList accountList;\n" +

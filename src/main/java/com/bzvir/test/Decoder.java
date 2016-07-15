@@ -79,7 +79,7 @@ public class Decoder {
     public static void main(String[] args) {
         String dataFilePath = dirPath + "settings.dat";
         ClassGenerator generator = new ClassGenerator();
-//        Class loadedClass = generator.generateClassDeclaration(dataFilePath);
+//        Class loadedClass = generator.generateClassDeclarations(dataFilePath);
     }
 
     public static void main2(String[] args) {

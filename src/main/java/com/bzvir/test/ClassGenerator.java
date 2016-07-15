@@ -32,16 +32,16 @@ public class ClassGenerator {
         return args;
     }
 
-    public String getDirtyClassDeclarations(String dataFilePath) {
+    public String readClassDeclarations(String dataFilePath) {
         if (dataFilePath == null || !(new File(dataFilePath).exists())) {
             throw new IllegalArgumentException();
         }
         List<String> args = getJdeserializeArgs();
         args.add(dataFilePath);
-        return getDirtyClassDeclarations(args);
+        return readClassDeclarations(args);
     }
 
-    public String getDirtyClassDeclarations(List<String> args) {
+    public String readClassDeclarations(List<String> args) {
         ConsoleOutputCapturer capturer = new ConsoleOutputCapturer();
         boolean alsoWriteIntoConsole = false;
         capturer.start(alsoWriteIntoConsole);
@@ -54,35 +54,47 @@ public class ClassGenerator {
         return textLine;
     }
 
-    public List<String> fixClassDeclaration(String textLine) {
+    public List<String> getClassDeclaration(String textLine) {
         String[] lines = textLine.split(System.getProperty("line.separator"));
         String delimiter = "////";
+        String cleaned = cleanDeclarations(lines, delimiter);
+        return divideByDelimiter(delimiter, cleaned);
+    }
 
-        String packageLine = lines[0].split(" ")[1];
-        String packageName = packageLine.substring(0, packageLine.lastIndexOf("."));
+    private String cleanDeclarations(String[] lines, String delimiter) {
+        String packageName = extractPackageName(lines[0].split(" ")[1]);
 
         StringBuilder sb = new StringBuilder();
-
         for (int i = 1; i < lines.length; i++) {
 
             if (lines[i].startsWith("////")) {
+                continue;
+            }else if (lines[i].length() < 1) {
             } else if (lines[i].startsWith("class")) {
                 sb.append(delimiter)
                         .append("package ").append(packageName).append(";\n\n")
                         .append("@lombok.Getter\n@lombok.Setter\n@lombok.ToString\n")
                         .append("public ").append(lines[i].replaceFirst(packageName + ".", ""));
-            } else {
+            } else if (lines[i].length() > 1) {
                 sb.append(lines[i]);
             }
             sb.append("\n");
         }
-        return Arrays.asList(sb.toString().split(delimiter))
-                .stream()
-                    .filter(s -> s.length() > 1)
-                    .collect(Collectors.toList());
+        return sb.toString();
     }
 
-    private List<Class> loadClass(List<String> declarations) {
+    public String extractPackageName(String s) {
+        String packageLine = (s.contains(" ")) ? s.split(" ")[1] : s;
+        return packageLine.substring(0, packageLine.lastIndexOf("."));
+    }
+
+    private List<String> divideByDelimiter(String delimiter, String text) {
+        return Arrays.asList(text.split(delimiter))
+                .stream().filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    public List<Class> loadClass(List<String> declarations) {
         return declarations.stream().map(s -> loadClass(s)).collect(Collectors.toList());
     }
 
@@ -100,29 +112,27 @@ public class ClassGenerator {
         Class fooClass = null;
         try {
             fooClass = classLoader.loadClass(className);
-//            for(Method method : fooClass.getDeclaredMethods()) {
-//                System.out.println(method);
-//            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return fooClass;
     }
 
-    private String extractWord(String text, String beforeWord, char splitter) {
-        int wordIndex = text.lastIndexOf(beforeWord) + beforeWord.length() + 1;
+    public String extractWord(String text, String beforeWord, char splitter) {
+        int wordIndex = (!beforeWord.isEmpty())
+                ? text.lastIndexOf(beforeWord) + beforeWord.length() + 1
+                : 0;
         int splitterIndex = text.indexOf(splitter, wordIndex);
         return text.substring(wordIndex, splitterIndex);
     }
 
-    public List<String> generateClassDeclaration(String dataFilePath) {
-        String dirtyClassDeclarations = getDirtyClassDeclarations(dataFilePath);
-
-        return fixClassDeclaration(dirtyClassDeclarations);
+    public List<String> generateClassDeclarations(String dataFilePath) {
+        String dirtyClassDeclarations = readClassDeclarations(dataFilePath);
+        return getClassDeclaration(dirtyClassDeclarations);
     }
 
     public List<String> constructClasses(String sampleFile, File pathToSave) {
-        List<String> classes = generateClassDeclaration(sampleFile);
+        List<String> classes = generateClassDeclarations(sampleFile);
         return classes.stream()
                 .map((s -> constructClass(s, pathToSave)))
                 .filter(s -> s.isEmpty())
