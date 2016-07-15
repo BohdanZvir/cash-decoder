@@ -11,10 +11,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.text.StringContainsInOrder.stringContainsInOrder;
 import static org.junit.Assert.*;
 
 public class ClassGeneratorTest {
@@ -93,7 +95,6 @@ public class ClassGeneratorTest {
 
         assertThat(className, not(containsString(".")));
         assertTrue(Character.isUpperCase(className.charAt(0)));
-        System.out.println(fixedDeclaration);
     }
 
     @Test
@@ -102,6 +103,34 @@ public class ClassGeneratorTest {
         created.addAll(constructed);
 
         assertThat(constructed, hasItem(isA(File.class)));
+    }
+
+    @Test
+    public void ridOfJdeserializeCommentClassDeclarations() {
+        String str = "read: com.burtyka.cash.core.Account _h0x7e0003 = r_0x7e0000;  \n" +
+                "//// BEGIN class declarations (excluding array classes) (exclusion filter java.util.*)\n" +
+                "class com.burtyka.cash.core.Account implements java.io.Serializable {\n" +
+                "    int accountDirection;\n" +
+                "    int color;\n" +
+                "    java.util.ArrayList accountList;\n" +
+                "    java.lang.String currencyId;\n" +
+                "    java.lang.String description;\n" +
+                "    java.lang.String id;\n" +
+                "    java.util.ArrayList items;\n" +
+                "    java.lang.String name;\n" +
+                "}\n" +
+                "\n" +
+                "//// END class declarations";
+        List<String> collect = generator.extractOnlyDeclarations(str);
+        StringBuilder sb = new StringBuilder();
+        for (String s : collect) {
+            sb.append(s).append("\n");
+        }
+        String actual = sb.toString();
+        assertThat(actual, not(allOf(
+                containsString("////"),
+                containsString(":"))));
+        assertThat(actual, stringContainsInOrder(Arrays.asList("{", "}")));
     }
 
 }

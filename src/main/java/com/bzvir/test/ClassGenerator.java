@@ -1,7 +1,6 @@
 package com.bzvir.test;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import org.unsynchronized.jdeserialize;
 
@@ -53,24 +52,38 @@ public class ClassGenerator {
     }
 
     public List<String> getClassDeclaration(String textLine) {
-        String[] lines = textLine.split(System.getProperty("line.separator"));
-        String delimiter = "////";
-        String cleaned = cleanDeclarations(lines, delimiter);
-        return divideByDelimiter(delimiter, cleaned);
+        String cleaned = cleanDeclarations(textLine);
+        return divideByDelimiter("", cleaned);
     }
 
-    private String cleanDeclarations(String[] lines, String delimiter) {
-        String canonicalName = lines[0].split(" ")[1];
-        String packageName = extractPackageName(canonicalName);
+    public List<String> extractOnlyDeclarations(String text) {
+        String[] strings = text.split(System.getProperty("line.separator"));
+        List<String> collect = Arrays.stream(strings)
+                .filter(s -> !s.startsWith("read"))
+                .filter(s -> !s.startsWith("////"))
+                .collect(Collectors.toList());
+        return collect;
+    }
 
+    public String cleanDeclarations(String text) {
+        text = text.split("////")[1];
+        List<String> dec = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
+        String[] lines = text.split("[\n|\\s]+class\\s+");
         for (int i = 1; i < lines.length; i++) {
 
             if (lines[i].startsWith("////")) {
                 continue;
             }else if (lines[i].length() < 1) {
             } else if (lines[i].startsWith("class")) {
-                sb.append(delimiter)
+
+
+                String canonicalName = lines[i].split(" ")[1];
+                int pointIndex = canonicalName.lastIndexOf('.');
+                String packageName = canonicalName.substring(0, pointIndex - 1);
+                String className = canonicalName.substring(pointIndex);
+
+                sb
                         .append("package ").append(packageName).append(";\n\n")
                         .append("@lombok.Getter\n@lombok.Setter\n@lombok.ToString\n")
                         .append("public ").append(lines[i].replaceFirst(packageName + ".", ""));
