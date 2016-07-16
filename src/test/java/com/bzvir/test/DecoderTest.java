@@ -1,11 +1,22 @@
 package com.bzvir.test;
 
-import com.bzvir.reader.PrivatXlsReader;
+import com.bzvir.model.Category;
+import com.bzvir.reader.Privat24XlsReader;
+import com.bzvir.reader.Reader;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.collection.IsIn.isIn;
+import static org.hamcrest.core.Every.everyItem;
+import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.*;
 
 /**
@@ -13,14 +24,44 @@ import static org.junit.Assert.*;
  */
 public class DecoderTest {
     private final String SAMPLE_DIR = System.getProperty("user.dir") + "/sample data/";
+    private String filePath;
+    private Reader reader;
+
+    @Before
+    public void setUp() {
+        reader = new Privat24XlsReader(filePath);
+        filePath = SAMPLE_DIR + "statements.xls";
+    }
 
     @Test
     public void readPrivat24Report() {
-        com.bzvir.reader.Reader reader = new PrivatXlsReader();
-        String filePath = SAMPLE_DIR + "statements.xls";
         Map<String , String> result = reader.readFile(filePath);
         assertNotNull(result);
         assertFalse(result.isEmpty());
+
+        LocalDate timeStart = LocalDate.parse("2016-07-01");
+        LocalDate timeEnd = LocalDate.parse("2016-07-16");
+        Map<Category, Double> actual = reader.collectByCategories(timeStart, timeEnd);
+        assertThat(actual.keySet(), not(equalTo(0)));
+    }
+
+    @Test
+    public void loadXlsSheetModel() {
+        Sheet sheet = reader.loadFirstSheet(filePath);
+        assertThat(sheet, isA(Sheet.class));
+        Iterator<Row> rowIterator = sheet.rowIterator();
+        assertThat(true, is(rowIterator.hasNext()));
+    }
+
+    @Test
+    public void checkOnRowTitles() {
+        Set<String> expected = reader.getRowTitles();
+
+        Sheet sheet = reader.loadFirstSheet(filePath);
+        Set<String> actual = reader.readRowTitles(sheet);
+
+        assertThat(actual, not(empty()));
+        assertThat(actual, everyItem(isIn(expected)));
     }
 
 }
