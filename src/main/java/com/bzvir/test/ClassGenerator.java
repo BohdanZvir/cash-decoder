@@ -1,14 +1,11 @@
 package com.bzvir.test;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import org.unsynchronized.jdeserialize;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,19 +41,14 @@ public class ClassGenerator {
         capturer.start(alsoWriteIntoConsole);
         jdeserialize.main(args.toArray(new String[]{}));
         String textLine = capturer.stop();
-        System.out.println(textLine);
         if (textLine == null || textLine.isEmpty()) {
             throw new RuntimeException("Had not captured jdeserialize output");
         }
         return textLine;
     }
 
-    public List<String> getClassDeclaration(String textLine) {
-        String cleaned = cleanDeclarations(textLine);
-        return divideByDelimiter("", cleaned);
-    }
 
-    public List<String> extractOnlyDeclarations(String text) {
+    public List<String> clearDeclarations(String text) {
         String[] strings = text.split(System.getProperty("line.separator"));
         List<String> collect = Arrays.stream(strings)
                 .filter(s -> !s.startsWith("read"))
@@ -65,45 +57,40 @@ public class ClassGenerator {
         return collect;
     }
 
-    public String cleanDeclarations(String text) {
-        text = text.split("////")[1];
-        List<String> dec = new ArrayList<>();
+    public Map<File, List<String>> getClassDeclaration(String text, File pathToSave) {
+        List<String> lines = clearDeclarations(text);
+        Map<File, List<String>> collect = new HashMap<>();
         StringBuilder sb = new StringBuilder();
-        String[] lines = text.split("[\n|\\s]+class\\s+");
-        for (int i = 1; i < lines.length; i++) {
 
-            if (lines[i].startsWith("////")) {
-                continue;
-            }else if (lines[i].length() < 1) {
-            } else if (lines[i].startsWith("class")) {
+        Iterator<String> iterator = lines.iterator();
+        while (iterator.hasNext()) {
+            String str = iterator.next();
 
-
-                String canonicalName = lines[i].split(" ")[1];
+            List<String> list = new ArrayList<>();
+            if (str.startsWith("class")) {
+                String canonicalName = str.split(" ")[1];
+                File file = new File(pathToSave, canonicalName.replace(".", File.separator) + ".java");
+                list = new ArrayList<>();
+                sb = new StringBuilder();
+                collect.put(file, list);
                 int pointIndex = canonicalName.lastIndexOf('.');
                 String packageName = canonicalName.substring(0, pointIndex - 1);
-                String className = canonicalName.substring(pointIndex);
-
                 sb
                         .append("package ").append(packageName).append(";\n\n")
                         .append("@lombok.Getter\n@lombok.Setter\n@lombok.ToString\n")
-                        .append("public ").append(lines[i].replaceFirst(packageName + ".", ""));
-            } else if (lines[i].length() > 1) {
-                sb.append(lines[i]);
+                        .append("public ").append(str.replaceFirst(packageName + ".", ""));
+                list.add(sb.toString());
             }
-            sb.append("\n");
+            if (sb.length() != 0 && !str.isEmpty()) {
+                list.add(str);
+            }
         }
-        return sb.toString();
+        return collect;
     }
 
     public String extractPackageName(String s) {
         String packageLine = (s.contains(" ")) ? s.split(" ")[1] : s;
         return packageLine.substring(0, packageLine.lastIndexOf("."));
-    }
-
-    private List<String> divideByDelimiter(String delimiter, String text) {
-        return Arrays.asList(text.split(delimiter))
-                .stream().filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
     }
 
     public static String extractWord(String text, String beforeWord, char splitter) {
@@ -114,35 +101,36 @@ public class ClassGenerator {
         return text.substring(wordIndex, splitterIndex);
     }
 
-    public List<String> generateClassDeclarations(String dataFilePath) {
+    public Map<File, List<String>> generateClassDeclarations(String dataFilePath, File pathToSave) {
         String dirtyClassDeclarations = readClassDeclarations(dataFilePath);
-        return getClassDeclaration(dirtyClassDeclarations);
+        return getClassDeclaration(dirtyClassDeclarations, pathToSave);
     }
 
-    public List<File> constructClasses(String sampleFile, File pathToSave) {
-        List<String> classes = generateClassDeclarations(sampleFile);
-        return classes.stream()
-                .map((s -> constructClass(s, pathToSave)))
-                .filter(s -> s != null)
+    public Set<File> constructClasses(String sampleFile, File pathToSave) {
+        Map<File, List<String>> classes = generateClassDeclarations(sampleFile, pathToSave);
+        classes.entrySet().stream()
+                .filter(s -> writeFile(s.getKey(), s.getValue()))
                 .collect(Collectors.toList());
+        return classes.keySet();
     }
 
-    private File constructClass(String sourceCode, File pathToSave) {
-        String packageName = extractWord(sourceCode, "package", ';');
-        String className = extractWord(sourceCode, "class", ' ');
-
-        String packagePath = packageName.replaceAll("\\.", File.separator);
-        File file = new File(pathToSave, packagePath);
-        file.mkdirs();
-        File created = new File(file, className + ".java");
+    private boolean writeFile(File file, List<String> text) {
+        file.getParentFile().mkdirs();
         try {
-            Files.write(sourceCode, created, Charsets.UTF_8);
+            file.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
-//        Joiner.on(".").join(packageName, className, "java");
-        return created;
+        try (FileWriter writer = new FileWriter(file)) {
+            for(String str: text) {
+                writer.write(str);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
 }
