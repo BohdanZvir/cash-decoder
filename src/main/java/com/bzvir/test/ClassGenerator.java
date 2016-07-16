@@ -58,28 +58,28 @@ public class ClassGenerator {
 
     public Map<File, List<String>> buildClassDeclarationsWithFiles(List<String> lines, File pathToSave) {
         Map<File, List<String>> collect = new HashMap<>();
-        StringBuilder sb = new StringBuilder();
 
         Iterator<String> iterator = lines.iterator();
+        List<String> list = new ArrayList<>();
         while (iterator.hasNext()) {
             String str = iterator.next();
 
-            List<String> list = new ArrayList<>();
             if (str.startsWith("class")) {
+                list = new ArrayList<>();
+
                 String canonicalName = str.split(" ")[1];
                 File file = new File(pathToSave, canonicalName.replace(".", File.separator) + ".java");
-                list = new ArrayList<>();
-                sb = new StringBuilder();
-                collect.put(file, list);
                 String packageName = extractPackageName(canonicalName);
+
+                StringBuilder sb = new StringBuilder();
                 sb
                         .append("package ").append(packageName).append(";\n\n")
                         .append("@lombok.Getter\n@lombok.Setter\n@lombok.ToString\n")
-                        .append("public ").append(str.replaceFirst(packageName + ".", ""));
+                        .append("public ").append(str.replaceFirst(packageName + ".", "")).append("\n");
                 list.add(sb.toString());
-            }
-            if (sb.length() != 0 && !str.isEmpty()) {
-                list.add(str);
+                collect.put(file, list);
+            } else if (!list.isEmpty() && !str.isEmpty()) {
+                list.add(str + "\n");
             }
         }
         return collect;

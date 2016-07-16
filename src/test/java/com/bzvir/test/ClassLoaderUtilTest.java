@@ -35,4 +35,12 @@ public class ClassLoaderUtilTest {
         assertEquals(fooClass.getCanonicalName(), className);
         assertThat(fooClass.getDeclaredMethods().length, not(equalTo(0)));
     }
+
+    @Test
+    public void extractWordAfter() {
+        String text = "package com.burtyka.cash.core;\n";
+        String packageName = new ClassLoaderUtil().extractWord(text, "package", ';');
+
+        assertThat(packageName, equalTo("com.burtyka.cash.core"));
+    }
 }

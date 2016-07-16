@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.*;
 
 public class ClassGeneratorTest {
@@ -99,17 +100,25 @@ public class ClassGeneratorTest {
     }
 
     @Test
-    public void extractClassNameWithoutPackage() {
-        String fixed = "class com.burtyka.cash.core.Account implements java.io.Serializable ";
-        int classIndex = fixed.indexOf("class") + "class ".length();
-        int spaceIndex = fixed.indexOf(' ', classIndex);
-        String className = fixed.substring(classIndex, spaceIndex);
-        if (className.indexOf(".") > -1) {
-            className = className.substring(className.lastIndexOf(".") + 1);
-        }
+    public void buildClassDeclarationsWithFiles() {
+        List<String> lines = Arrays.asList(
+                "class com.burtyka.cash.core.Transaction implements java.io.Serializable {",
+                "    double amount;",
+                "    float exchangeRate;",
+                "    java.lang.String date;",
+                "    java.lang.String description;",
+                "    java.lang.String fromAccountId;",
+                "    java.lang.String id;",
+                "    java.lang.String toAccountId;",
+                "}");
+        Map<File, List<String>> map = generator.buildClassDeclarationsWithFiles(lines, pathToSave);
 
-        assertThat(className, not(containsString(".")));
-        assertTrue(Character.isUpperCase(className.charAt(0)));
+        Set<File> actual = map.keySet();
+        assertThat(actual, not(empty()));
+        map.forEach((k,v) -> {
+            assertThat(v, hasEqualNumber('{','}'));
+            assertThat(k, isA(File.class));
+        });
     }
 
     @Test
@@ -159,6 +168,20 @@ public class ClassGeneratorTest {
                 return numberChar1 != 0 && numberChar1 == numberChar2;
             }
         };
+    }
+
+    @Test
+    public void extractClassNameWithoutPackage() {
+        String fixed = "class com.burtyka.cash.core.Account implements java.io.Serializable ";
+        int classIndex = fixed.indexOf("class") + "class ".length();
+        int spaceIndex = fixed.indexOf(' ', classIndex);
+        String className = fixed.substring(classIndex, spaceIndex);
+        if (className.indexOf(".") > -1) {
+            className = className.substring(className.lastIndexOf(".") + 1);
+        }
+
+        assertThat(className, not(containsString(".")));
+        assertTrue(Character.isUpperCase(className.charAt(0)));
     }
 
 }
