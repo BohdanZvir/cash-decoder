@@ -14,12 +14,10 @@ import java.io.File;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.text.StringContainsInOrder.stringContainsInOrder;
 import static org.junit.Assert.*;
 
 public class ClassGeneratorTest {
 
-    private static String testDirPath;
     private ClassGenerator generator;
     private String sampleFile;
     private static ResourceBundle RESOURCE_BUNDLE;
@@ -34,9 +32,9 @@ public class ClassGeneratorTest {
     @Before
     public void setUp() throws Exception {
         generator = new ClassGenerator();
-        String sampleDir = RESOURCE_BUNDLE.getString("sample.dir");
-        testDirPath = System.getProperty("user.dir") + sampleDir;
-        sampleFile = testDirPath + "transactionManager.dat";
+        sampleFile = System.getProperty("user.dir")
+                + RESOURCE_BUNDLE.getString("sample.dir")
+                + "transactionManager.dat";
         String path = (RESOURCE_BUNDLE.containsKey("constructed.classes.package"))
                 ? RESOURCE_BUNDLE.getString("constructed.classes.package")
                 : System.getProperty("user.dir") + "/src/main/java";
@@ -50,14 +48,29 @@ public class ClassGeneratorTest {
     }
 
     @Test
-    public void printEmptyClassDeclarations() {
-        String textLine = generator.readClassDeclarations(sampleFile);
-        System.out.println(":: after capturing\n" + textLine);
-        assertTrue(textLine.contains("class"));
+    public void generateClassFileWithPackageDirStructure() {
+        Set<File> constructed = generator.constructClasses(sampleFile, pathToSave);
+        created.addAll(constructed);
+
+        boolean actualExist = false;
+        for (File file : constructed) {
+            actualExist |= file.exists();
+        }
+
+        assertThat(constructed, hasItem(isA(File.class)));
+        assertTrue(actualExist);
     }
 
     @Test
-    public void generateFullClassDeclaration() {
+    public void printEmptyClassDeclarations() {
+        String textLine = generator.readClassDeclarations(sampleFile);
+
+        assertTrue(textLine.contains("class"));
+        assertThat(Arrays.asList(textLine), hasEqualNumber('{', '}'));
+    }
+
+    @Test
+    public void getRidOfJdeserializationStuff() {
         String str = "read: com.burtyka.cash.core.Account _h0x7e0003 = r_0x7e0000;  \n" +
                 "//// BEGIN class declarations (excluding array classes) (exclusion filter java.util.*)\n" +
                 "class com.burtyka.cash.core.Account implements java.io.Serializable {\n" +
@@ -73,91 +86,44 @@ public class ClassGeneratorTest {
                 "\n" +
                 "//// END class declarations";
 
-        List<String> fixedDeclaration = generator.clearDeclarations(str);
-        String actual = fixedDeclaration.get(0);
+        List<String> actualList = generator.clearFromJdeserialization(str);
+        String actual = actualList.get(0);
+
         assertThat(actual, not(allOf(
                 containsString("read:"),
-                containsString("////"),
                 containsString("BEGIN"),
                 containsString("END")
                 )));
-        assertThat(fixedDeclaration, everyItem(not(containsString("////"))));
-//        assertThat("////", not(isOneOf(fixedDeclaration)));
-//        assertThat(actual, stringContainsInOrder(Arrays.asList("{", "}")));
-        System.out.println(fixedDeclaration);
-        assertThat(fixedDeclaration, hasEqualNumber('{', '}'));
+        assertThat(actualList, everyItem(not(containsString("////"))));
+        assertThat(actualList, hasEqualNumber('{', '}'));
     }
 
     @Test
     public void extractClassNameWithoutPackage() {
-
         String fixed = "class com.burtyka.cash.core.Account implements java.io.Serializable ";
         int classIndex = fixed.indexOf("class") + "class ".length();
         int spaceIndex = fixed.indexOf(' ', classIndex);
         String className = fixed.substring(classIndex, spaceIndex);
+        if (className.indexOf(".") > -1) {
+            className = className.substring(className.lastIndexOf(".") + 1);
+        }
 
         assertThat(className, not(containsString(".")));
         assertTrue(Character.isUpperCase(className.charAt(0)));
     }
 
     @Test
-    public void generateClassFileWithPackageDirStructure() {
-        Set<File> constructed = generator.constructClasses(sampleFile, pathToSave);
-        created.addAll(constructed);
-
-        boolean actualExist = false;
-        for (File file : constructed) {
-            actualExist |= file.exists();
-            System.out.println(":: " + file.getAbsolutePath());
-        }
-
-        assertThat(constructed, hasItem(isA(File.class)));
-        assertTrue(actualExist);
-    }
-
-    @Test
-    public void ridOfJdeserializeCommentClassDeclarations() {
-        String str = "read: com.burtyka.cash.core.TransactionManager _h0x7e0003 = r_0x7e0000;  \n" +
-                "//// BEGIN class declarations (excluding array classes) (exclusion filter java.util.*)\n" +
-                "class com.burtyka.cash.core.Transaction implements java.io.Serializable {\n" +
-                "    double amount;\n" +
-                "    float exchangeRate;\n" +
-                "    java.lang.String date;\n" +
-                "    java.lang.String description;\n" +
-                "    java.lang.String fromAccountId;\n" +
-                "    java.lang.String id;\n" +
-                "    java.lang.String toAccountId;\n" +
-                "}\n" +
-                "\n" +
-                "class com.burtyka.cash.core.TransactionManager implements java.io.Serializable {\n" +
-                "    java.util.Map transactionPositionsToAccounts;\n" +
-                "    java.util.ArrayList transasctions;\n" +
-                "}\n" +
-                "\n" +
-                "//// END class declarations";
-        List<String> collect = generator.clearDeclarations(str);
-        StringBuilder sb = new StringBuilder();
-        for (String s : collect) {
-            sb.append(s).append("\n");
-        }
-        String actual = sb.toString();
-        assertThat(actual, not(allOf(
-                containsString("////"),
-                containsString(":"))));
-        assertThat(actual, stringContainsInOrder(Arrays.asList("{", "}")));
-        System.out.println(actual);
-    }
-
-    @Test
-    public void extractPackageName() {
-        String str = "read: com.burtyka.cash.core.TransactionManager _h0x7e0003 = r_0x7e0000;  \n";
+    public void extractPackageNameFromClassCanonicalname() {
+        String str = "com.burtyka.cash.core.TransactionManager";
         String actual = generator.extractPackageName(str);
+
         assertThat(actual, equalTo("com.burtyka.cash.core"));
     }
 
     @Test
     public void notEqualNumberOfTwoCharsInText(){
         List<String> strings = Arrays.asList(" {{{", "{}", "}");
+
         assertThat(strings, not(hasEqualNumber('{', '}')));
     }
 

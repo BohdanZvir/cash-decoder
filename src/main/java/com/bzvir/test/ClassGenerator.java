@@ -17,7 +17,7 @@ public class ClassGenerator {
         super();
     }
 
-    public static List<String> getJdeserializeArgs() {
+    public List<String> getJdeserializeArgs() {
         List<String> args = new ArrayList<>();
         args.add("-nocontent");
         args.add("-noinstances");
@@ -47,8 +47,7 @@ public class ClassGenerator {
         return textLine;
     }
 
-
-    public List<String> clearDeclarations(String text) {
+    public List<String> clearFromJdeserialization(String text) {
         String[] strings = text.split(System.getProperty("line.separator"));
         List<String> collect = Arrays.stream(strings)
                 .filter(s -> !s.startsWith("read"))
@@ -57,8 +56,7 @@ public class ClassGenerator {
         return collect;
     }
 
-    public Map<File, List<String>> getClassDeclaration(String text, File pathToSave) {
-        List<String> lines = clearDeclarations(text);
+    public Map<File, List<String>> buildClassDeclarationsWithFiles(List<String> lines, File pathToSave) {
         Map<File, List<String>> collect = new HashMap<>();
         StringBuilder sb = new StringBuilder();
 
@@ -73,8 +71,7 @@ public class ClassGenerator {
                 list = new ArrayList<>();
                 sb = new StringBuilder();
                 collect.put(file, list);
-                int pointIndex = canonicalName.lastIndexOf('.');
-                String packageName = canonicalName.substring(0, pointIndex - 1);
+                String packageName = extractPackageName(canonicalName);
                 sb
                         .append("package ").append(packageName).append(";\n\n")
                         .append("@lombok.Getter\n@lombok.Setter\n@lombok.ToString\n")
@@ -88,26 +85,15 @@ public class ClassGenerator {
         return collect;
     }
 
-    public String extractPackageName(String s) {
-        String packageLine = (s.contains(" ")) ? s.split(" ")[1] : s;
-        return packageLine.substring(0, packageLine.lastIndexOf("."));
+    public String extractPackageName(String canonicalName) {
+        return canonicalName.substring(0, canonicalName.lastIndexOf('.'));
     }
 
-    public static String extractWord(String text, String beforeWord, char splitter) {
-        int wordIndex = (!beforeWord.isEmpty())
-                ? text.lastIndexOf(beforeWord) + beforeWord.length() + 1
-                : 0;
-        int splitterIndex = text.indexOf(splitter, wordIndex);
-        return text.substring(wordIndex, splitterIndex);
-    }
+    public Set<File> constructClasses(String dataFilePath, File pathToSave) {
+        String dirtyDeclar = readClassDeclarations(dataFilePath);
+        List<String> lines = clearFromJdeserialization(dirtyDeclar);
+        Map<File, List<String>> classes = buildClassDeclarationsWithFiles(lines, pathToSave);
 
-    public Map<File, List<String>> generateClassDeclarations(String dataFilePath, File pathToSave) {
-        String dirtyClassDeclarations = readClassDeclarations(dataFilePath);
-        return getClassDeclaration(dirtyClassDeclarations, pathToSave);
-    }
-
-    public Set<File> constructClasses(String sampleFile, File pathToSave) {
-        Map<File, List<String>> classes = generateClassDeclarations(sampleFile, pathToSave);
         classes.entrySet().stream()
                 .filter(s -> writeFile(s.getKey(), s.getValue()))
                 .collect(Collectors.toList());

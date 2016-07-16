@@ -6,8 +6,6 @@ import org.abstractmeta.toolbox.compilation.compiler.impl.JavaSourceCompilerImpl
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.bzvir.test.ClassGenerator.extractWord;
-
 /**
  * Created by bohdan on 15.07.16.
  */
@@ -36,4 +34,13 @@ public class ClassLoaderUtil {
         }
         return fooClass;
     }
+
+    public String extractWord(String text, String beforeWord, char splitter) {
+        int wordIndex = (!beforeWord.isEmpty())
+                ? text.lastIndexOf(beforeWord) + beforeWord.length() + 1
+                : 0;
+        int splitterIndex = text.indexOf(splitter, wordIndex);
+        return text.substring(wordIndex, splitterIndex);
+    }
+
 }
