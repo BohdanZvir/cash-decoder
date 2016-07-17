@@ -76,15 +76,14 @@ public class Decoder {
 
     }
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
+//        jDeserial(dirPath + "settings.dat");
         String dataFilePath = dirPath + "settings.dat";
         ClassGenerator generator = new ClassGenerator();
 //        Class loadedClass = generator.generateClassDeclarations(dataFilePath);
     }
 
-    public static void main2(String[] args) {
-
-        jDeserial(dirPath + "settings.dat");
+    public static void main(String[] args) {
 
         Settings settings = getValue(Settings.class);
         Account account = getValue(Account.class);

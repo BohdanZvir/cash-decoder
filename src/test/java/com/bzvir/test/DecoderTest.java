@@ -1,6 +1,7 @@
 package com.bzvir.test;
 
 import com.bzvir.model.Category;
+import com.bzvir.model.Event;
 import com.bzvir.reader.Privat24XlsReader;
 import com.bzvir.reader.Reader;
 import org.apache.poi.ss.usermodel.Row;
@@ -9,13 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.collection.IsIn.isIn;
-import static org.hamcrest.core.Every.everyItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.*;
 
@@ -26,11 +23,13 @@ public class DecoderTest {
     private final String SAMPLE_DIR = System.getProperty("user.dir") + "/sample data/";
     private String filePath;
     private Reader reader;
+    private Sheet sheet;
 
     @Before
     public void setUp() {
-        reader = new Privat24XlsReader(filePath);
         filePath = SAMPLE_DIR + "statements.xls";
+        reader = new Privat24XlsReader(filePath);
+        sheet = reader.loadFirstSheet(filePath);
     }
 
     @Test
@@ -47,7 +46,6 @@ public class DecoderTest {
 
     @Test
     public void loadXlsSheetModel() {
-        Sheet sheet = reader.loadFirstSheet(filePath);
         assertThat(sheet, isA(Sheet.class));
         Iterator<Row> rowIterator = sheet.rowIterator();
         assertThat(true, is(rowIterator.hasNext()));
@@ -55,13 +53,30 @@ public class DecoderTest {
 
     @Test
     public void checkOnRowTitles() {
-        Set<String> expected = reader.getRowTitles();
+        boolean theSame = reader.checkOnRowTitles();
+        assertThat(theSame, is(true));
+    }
 
-        Sheet sheet = reader.loadFirstSheet(filePath);
-        Set<String> actual = reader.readRowTitles(sheet);
+    @Test
+    public void loadData() throws Exception {
+        Set<String> titles = reader.getRowTitles();
+        List<Event> data = reader.loadData(titles);
+        assertThat(data, not(empty()));
+        assertThat(data, everyItem(instanceOf(Event.class)));
+    }
 
-        assertThat(actual, not(empty()));
-        assertThat(actual, everyItem(isIn(expected)));
+    @Test
+    public void constructEventModelFromP24SheetRow() {
+        Row row = sheet.getRow(2);
+        Event event = reader.constructEvent(row);
+
+        assertThat(event, isA(Event.class));
+        assertThat(event.getProperty("Сума у валюті картки"), instanceOf(Double.class));
+        assertThat(event.getProperty("Дата"), instanceOf(String.class));
+        assertThat(event.getProperty("Опис операції"), instanceOf(String.class));
+        assertThat(event.getProperty("Категорія"), instanceOf(String.class));
+        assertThat(event.getProperty("Валюта картки"), instanceOf(String.class));
+        System.out.println(event);
     }
 
 }

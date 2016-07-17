@@ -1,6 +1,7 @@
 package com.bzvir.reader;
 
 import com.bzvir.model.Category;
+import com.bzvir.model.Event;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -19,23 +20,21 @@ import java.util.*;
  */
 public class Privat24XlsReader implements Reader {
 
-    private String filePath;
+    private Sheet sheet;
 
     public Privat24XlsReader(String filePath) {
-        this.filePath = filePath;
+        sheet = loadFirstSheet(filePath);
     }
 
     @Override
     public Map<String, String> readFile(String filePath) {
-        Sheet sheet = loadFirstSheet(filePath);
-
         Iterator<Row> rowIterator = sheet.iterator();
         rowIterator.hasNext();
         Row row = rowIterator.next();
 
         Iterator<Cell> cellIterator = row.cellIterator();
 
-        HashMap<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         return map;
     }
 
@@ -61,21 +60,59 @@ public class Privat24XlsReader implements Reader {
 
     @Override
     public Set<String> getRowTitles() {
-        return new HashSet<>(Arrays.asList(
-                "Дата","Час", "Категорія", "Картка", "Опис операції", "Сума у валюті картки",
-                "Валюта картки", "Сума у валюті транзакції", "Валюта транзакції",
-                "Залишок на кінець періоду", "Валюта залишку"));
+        return new LinkedHashSet<>(Arrays.asList(
+                "Сума у валюті картки",
+                "Дата",
+                "Час",
+                "Опис операції",
+                "Категорія", /*"Картка",*/
+                "Валюта картки"/*, "Сума у валюті транзакції", "Валюта транзакції",
+                "Залишок на кінець періоду", "Валюта залишку"*/));
     }
 
     @Override
-    public Set<String> readRowTitles(Sheet sheet) {
-        Set<String> set = new HashSet<>();
+    public List<String> readRowTitles() {
+        List<String> list = new LinkedList<>();
         Row row = sheet.getRow(1);
+        row.forEach(s -> list.add(s.getStringCellValue()));
+        return list;
+    }
 
-        Iterator<Cell> iterator = row.iterator();
-        while(iterator.hasNext()) {
-            set.add(iterator.next().getStringCellValue());
+    @Override
+    public boolean checkOnRowTitles() {
+        Set<String> expected = getRowTitles();
+        List<String> actual = readRowTitles();
+        return expected.containsAll(actual);
+    }
+
+    @Override
+    public List<Event> loadData(Set<String> titles) throws Exception {
+        List<String> rawTitles = readRowTitles();
+        if (!rawTitles.containsAll(getRowTitles())) {
+            throw new Exception("Privat24 dump has wrong format.");
         }
-        return set;
+        List<Event> events = new LinkedList<>();
+        for (int i = 2; i < sheet.getLastRowNum() - 2; i++) {
+            Row row = sheet.getRow(i);
+            events.add(constructEvent(row));
+        }
+        return events;
+    }
+
+    @Override
+    public Event constructEvent(Row row) {
+        Event event = new Event();
+        List<String> actual = readRowTitles();
+        for (String title : getRowTitles()) {
+            int index = actual.indexOf(title);
+            Cell cell = row.getCell(index);
+            int cellType = cell.getCellType();
+            if (cellType == Cell.CELL_TYPE_STRING) {
+                event.setProperty(title, cell.getStringCellValue());
+            } else if (cellType == Cell.CELL_TYPE_NUMERIC) {
+                event.setProperty(title, cell.getNumericCellValue());
+            }
+        }
+        return event;
     }
 }
