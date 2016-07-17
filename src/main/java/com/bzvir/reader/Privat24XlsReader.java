@@ -82,7 +82,7 @@ public class Privat24XlsReader implements Reader {
     public boolean checkOnRowTitles() {
         Set<String> expected = getRowTitles();
         List<String> actual = readRowTitles();
-        return expected.containsAll(actual);
+        return actual.containsAll(expected);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class Privat24XlsReader implements Reader {
             throw new Exception("Privat24 dump has wrong format.");
         }
         List<Event> events = new LinkedList<>();
-        for (int i = 2; i < sheet.getLastRowNum() - 2; i++) {
+        for (int i = 2; i < sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             events.add(constructEvent(row));
         }

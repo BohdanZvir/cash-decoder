@@ -32,17 +32,17 @@ public class DecoderTest {
         sheet = reader.loadFirstSheet(filePath);
     }
 
-    @Test
-    public void readPrivat24Report() {
-        Map<String , String> result = reader.readFile(filePath);
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-
-        LocalDate timeStart = LocalDate.parse("2016-07-01");
-        LocalDate timeEnd = LocalDate.parse("2016-07-16");
-        Map<Category, Double> actual = reader.collectByCategories(timeStart, timeEnd);
-        assertThat(actual.keySet(), not(equalTo(0)));
-    }
+//    @Test
+//    public void readPrivat24Report() {
+//        Map<String , String> result = reader.readFile(filePath);
+//        assertNotNull(result);
+//        assertFalse(result.isEmpty());
+//
+//        LocalDate timeStart = LocalDate.parse("2016-07-01");
+//        LocalDate timeEnd = LocalDate.parse("2016-07-16");
+//        Map<Category, Double> actual = reader.collectByCategories(timeStart, timeEnd);
+//        assertThat(actual.keySet(), not(equalTo(0)));
+//    }
 
     @Test
     public void loadXlsSheetModel() {
@@ -76,7 +76,6 @@ public class DecoderTest {
         assertThat(event.getProperty("Опис операції"), instanceOf(String.class));
         assertThat(event.getProperty("Категорія"), instanceOf(String.class));
         assertThat(event.getProperty("Валюта картки"), instanceOf(String.class));
-        System.out.println(event);
     }
 
 }
