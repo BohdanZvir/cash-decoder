@@ -1,4 +1,4 @@
-package com.bzvir.test;
+package com.bzvir.util;
 
 /**
  * Created by bohdan on 19.06.16.

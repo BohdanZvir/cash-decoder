@@ -1,4 +1,4 @@
-package com.bzvir.test;
+package com.bzvir.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

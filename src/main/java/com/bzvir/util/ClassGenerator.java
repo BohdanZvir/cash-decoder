@@ -1,4 +1,4 @@
-package com.bzvir.test;
+package com.bzvir.util;
 
 import org.unsynchronized.jdeserialize;
 

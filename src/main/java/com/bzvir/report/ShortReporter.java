@@ -28,39 +28,57 @@ public class ShortReporter {
                 expense = item;
             }
         }
-        return printExpenses(expense.getItems());
+        if (expense == null
+                || expense.getItems() == null
+                || expense.getItems().isEmpty()) {
+            return "";
+        }
+        StringBuffer report = new StringBuffer();
+        return printExpenses(expense.getItems(), report);
     }
 
-    private String printExpenses(List<Account> items) {
-        StringBuffer report = new StringBuffer();
+    private String printExpenses(List<Account> items, StringBuffer report) {
         for (Account item : items) {
-            report.append(item.getName());
-            double value = calculate(item);
-            report.append("\t\t" + value);
+            report
+                    .append("\n")
+                    .append(item.getName())
+                    .append("\n");
+            if (isParent(item)) {
+                printExpenses(item.getItems(), report);
+            } else {
+                String id = item.getId().trim();
+                printTransactions(id, report);
+            }
+//            double value = calculate(item);
+//            report.append("\t\t" + value);
         }
         return report.toString();
     }
 
-    private double calculate(Account item) {
-        double sum = 0;
-        for (Account account : item.getItems()) {
-            System.out.printf("========%s=========%n", account.getName());
-            if (account.getItems() !=null && !account.getItems().isEmpty()) {
-                for (Account item0 : account.getItems()) {
-                    sum += calculate(item0);
-                }
-            } else {
-                printTransactions(account.getId());
-            }
-        }
-        return sum;
+//    private double calculate(Account item) {
+//        double sum = 0;
+//        for (Account account : item.getItems()) {
+//            System.out.printf("========%s=========%n", account.getName());
+//            if (isParent(account)) {
+//                for (Account item0 : account.getItems()) {
+//                    sum += calculate(item0);
+//                }
+//            } else {
+//                printTransactions(account.getId());
+//            }
+//        }
+//        return sum;
+//    }
+
+    private boolean isParent(Account account) {
+        return account.getItems() !=null && !account.getItems().isEmpty();
     }
 
-    private void printTransactions(String id) {
+    private void printTransactions(String id, StringBuffer report) {
         List<Transaction> transactions = transactionManager.getTransasctions();
         for (Transaction transaction : transactions) {
             if (transaction.getFromAccountId().equalsIgnoreCase(id)) {
-                System.out.println(transaction);
+                report.append(transaction).append("\n");
             }
         }
     }

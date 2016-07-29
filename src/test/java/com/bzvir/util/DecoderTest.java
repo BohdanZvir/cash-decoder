@@ -1,4 +1,4 @@
-package com.bzvir.test;
+package com.bzvir.util;
 
 import com.bzvir.model.Event;
 import com.bzvir.reader.Privat24XlsReader;

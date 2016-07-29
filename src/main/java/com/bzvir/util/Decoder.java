@@ -1,4 +1,4 @@
-package com.bzvir.test;
+package com.bzvir.util;
 
 import com.burtyka.cash.core.*;
 import com.bzvir.report.ShortReporter;
@@ -36,7 +36,7 @@ public class Decoder {
     }
 
 
-    private static <T> T getValue(Class<T> clazz) {
+    protected static <T> T getValue(Class<T> clazz) {
         String filename = files.get(clazz);
         String filePath = dirPath + filename;
         try {
