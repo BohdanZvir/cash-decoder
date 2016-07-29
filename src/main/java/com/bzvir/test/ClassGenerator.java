@@ -17,7 +17,7 @@ public class ClassGenerator {
         super();
     }
 
-    public List<String> getJdeserializeArgs() {
+    private List<String> getJdeserializeArgs() {
         List<String> args = new ArrayList<>();
         args.add("-nocontent");
         args.add("-noinstances");
@@ -49,11 +49,10 @@ public class ClassGenerator {
 
     public List<String> clearFromJdeserialization(String text) {
         String[] strings = text.split(System.getProperty("line.separator"));
-        List<String> collect = Arrays.stream(strings)
+        return Arrays.stream(strings)
                 .filter(s -> !s.startsWith("read"))
                 .filter(s -> !s.startsWith("////"))
                 .collect(Collectors.toList());
-        return collect;
     }
 
     public Map<File, List<String>> buildClassDeclarationsWithFiles(List<String> lines, File pathToSave) {

@@ -90,10 +90,8 @@ public class Decoder {
         TransactionManager transactionManager = getValue(TransactionManager.class);
         CurrencyManager currencyManager = getValue(CurrencyManager.class);
 
-        new ShortReporter(account, transactionManager).doReport();
-
-
-
+        String report = new ShortReporter(account, transactionManager).doReport();
+        System.out.println(report);
 
 
         //		FileOutputStream fileOut =

@@ -1,6 +1,5 @@
 package com.bzvir.test;
 
-import com.bzvir.model.Category;
 import com.bzvir.model.Event;
 import com.bzvir.reader.Privat24XlsReader;
 import com.bzvir.reader.Reader;
@@ -9,25 +8,24 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.LocalDate;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by bohdan on 18.06.16.
  */
 public class DecoderTest {
     private final String SAMPLE_DIR = System.getProperty("user.dir") + "/sample data/";
-    private String filePath;
     private Reader reader;
     private Sheet sheet;
 
     @Before
     public void setUp() {
-        filePath = SAMPLE_DIR + "statements.xls";
+        String filePath = SAMPLE_DIR + "statements.xls";
         reader = new Privat24XlsReader(filePath);
         sheet = reader.loadFirstSheet(filePath);
     }

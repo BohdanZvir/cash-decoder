@@ -28,23 +28,23 @@ public class ShortReporter {
                 expense = item;
             }
         }
-        printExpenses(expense.getItems());
-        return "";
+        return printExpenses(expense.getItems());
     }
 
-    private void printExpenses(List<Account> items) {
+    private String printExpenses(List<Account> items) {
+        StringBuffer report = new StringBuffer();
         for (Account item : items) {
-            System.out.println(item.getName());
+            report.append(item.getName());
             double value = calculate(item);
-            System.out.println("\t\t" + value);
+            report.append("\t\t" + value);
         }
-
+        return report.toString();
     }
 
     private double calculate(Account item) {
         double sum = 0;
         for (Account account : item.getItems()) {
-                System.out.printf("========%s=========%n", account.getName());
+            System.out.printf("========%s=========%n", account.getName());
             if (account.getItems() !=null && !account.getItems().isEmpty()) {
                 for (Account item0 : account.getItems()) {
                     sum += calculate(item0);
@@ -63,6 +63,5 @@ public class ShortReporter {
                 System.out.println(transaction);
             }
         }
-
     }
 }
