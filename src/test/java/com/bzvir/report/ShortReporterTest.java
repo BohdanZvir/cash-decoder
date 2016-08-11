@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.*;
 
 /**
- * Created by bohdan on 29.07.16.
+ * Created by bohdan.
  */
 public class ShortReporterTest extends AbstractTest {
 
@@ -46,9 +46,9 @@ public class ShortReporterTest extends AbstractTest {
         Account account = Mockito.mock(Account.class);
         TransactionManager tm = Mockito.mock(TransactionManager.class);
 
-        when(account.getItems()).thenReturn(new ArrayList<Account>());
+        when(account.getItems()).thenReturn(new ArrayList<>());
 
-        String report = new ShortReporter(account, tm).doReport();
+        String report = new ShortReporter(account).doReport();
         assertThat(report, isEmptyString());
     }
 

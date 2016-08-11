@@ -10,8 +10,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -26,7 +24,6 @@ public class Privat24XlsReader implements Reader {
         sheet = loadFirstSheet(filePath);
     }
 
-    @Override
     public Map<String, String> readFile(String filePath) {
         Iterator<Row> rowIterator = sheet.iterator();
         rowIterator.hasNext();
@@ -43,13 +40,11 @@ public class Privat24XlsReader implements Reader {
         return null;
     }
 
-    @Override
     public Sheet loadFirstSheet(String filePath) {
         Workbook wb = null;
         try {
             FileInputStream file = new FileInputStream(new File(filePath));
             wb = new HSSFWorkbook(file);  //-xls
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,7 +55,7 @@ public class Privat24XlsReader implements Reader {
     }
 
     @Override
-    public Set<String> getRowTitles() {
+    public Set<String> getTitles() {
         return new LinkedHashSet<>(Arrays.asList(
                 "Сума у валюті картки",
                 "Дата",
@@ -71,8 +66,7 @@ public class Privat24XlsReader implements Reader {
                 "Залишок на кінець періоду", "Валюта залишку"*/));
     }
 
-    @Override
-    public List<String> readRowTitles() {
+    private List<String> readRowTitles() {
         List<String> list = new LinkedList<>();
         Row row = sheet.getRow(1);
         row.forEach(s -> list.add(s.getStringCellValue()));
@@ -80,8 +74,8 @@ public class Privat24XlsReader implements Reader {
     }
 
     @Override
-    public boolean checkOnRowTitles() {
-        Set<String> expected = getRowTitles();
+    public boolean checkTitlesOnPresence() {
+        Set<String> expected = getTitles();
         List<String> actual = readRowTitles();
         return actual.containsAll(expected);
     }
@@ -89,7 +83,7 @@ public class Privat24XlsReader implements Reader {
     @Override
     public List<Event> loadData(Set<String> titles)  {
         List<String> rawTitles = readRowTitles();
-        if (!rawTitles.containsAll(getRowTitles())) {
+        if (!rawTitles.containsAll(getTitles())) {
             throw new RuntimeException("Privat24 dump has wrong format.");
         }
         List<Event> events = new LinkedList<>();
@@ -100,11 +94,10 @@ public class Privat24XlsReader implements Reader {
         return events;
     }
 
-    @Override
     public Event constructEvent(Row row) {
         Event event = new Event();
         List<String> actual = readRowTitles();
-        for (String title : getRowTitles()) {
+        for (String title : getTitles()) {
             int index = actual.indexOf(title);
             Cell cell = row.getCell(index);
             int cellType = cell.getCellType();

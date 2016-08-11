@@ -1,7 +1,7 @@
 package com.bzvir.util;
 
 /**
- * Created by bohdan on 19.06.16.
+ * Created by bohdan.
  */
 
 import org.hamcrest.Description;
@@ -35,6 +35,7 @@ public class ClassGeneratorTest {
         generator = new ClassGenerator();
         sampleFile = System.getProperty("user.dir")
                 + RESOURCE_BUNDLE.getString("sample.dir")
+                + "/"
                 + "transactionManager.dat";
         String path = (RESOURCE_BUNDLE.containsKey("constructed.classes.package"))
                 ? RESOURCE_BUNDLE.getString("constructed.classes.package")
@@ -44,7 +45,7 @@ public class ClassGeneratorTest {
 
     @After
     public void tearDown() {
-        created.stream().forEach(File::deleteOnExit);
+        created.forEach(File::deleteOnExit);
         created.clear();
     }
 
@@ -67,7 +68,7 @@ public class ClassGeneratorTest {
         String textLine = generator.readClassDeclarations(sampleFile);
 
         assertTrue(textLine.contains("class"));
-        assertThat(Arrays.asList(textLine), hasEqualNumber('{', '}'));
+        assertThat(Collections.singletonList(textLine), hasEqualNumber('{', '}'));
     }
 
     @Test
@@ -145,10 +146,8 @@ public class ClassGeneratorTest {
 
             @Override
             public boolean matches(Object item) {
-                if (item != null && item instanceof List && !((List)item).isEmpty()) {
-                    return matchChars((List<String>) item);
-                }
-                return false;
+                return (item != null && item instanceof List)
+                        && (!((List) item).isEmpty() && matchChars((List<String>) item));
             }
 
             private boolean matchChars(List<String> item) {
@@ -176,7 +175,7 @@ public class ClassGeneratorTest {
         int classIndex = fixed.indexOf("class") + "class ".length();
         int spaceIndex = fixed.indexOf(' ', classIndex);
         String className = fixed.substring(classIndex, spaceIndex);
-        if (className.indexOf(".") > -1) {
+        if (className.contains(".")) {
             className = className.substring(className.lastIndexOf(".") + 1);
         }
 

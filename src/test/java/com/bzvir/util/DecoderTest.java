@@ -18,9 +18,8 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by bohdan.
  */
-public class DecoderTest {
-    private final String SAMPLE_DIR = System.getProperty("user.dir") + "/sample data/";
-    private Reader reader;
+public class DecoderTest extends AbstractTest {
+    private Privat24XlsReader reader;
     private Sheet sheet;
 
     @Before
@@ -51,13 +50,13 @@ public class DecoderTest {
 
     @Test
     public void checkOnRowTitles() {
-        boolean theSame = reader.checkOnRowTitles();
+        boolean theSame = reader.checkTitlesOnPresence();
         assertThat(theSame, is(true));
     }
 
     @Test
     public void loadData() throws Exception {
-        Set<String> titles = reader.getRowTitles();
+        Set<String> titles = reader.getTitles();
         List<Event> data = reader.loadData(titles);
         assertThat(data, not(empty()));
         assertThat(data, everyItem(instanceOf(Event.class)));
@@ -83,13 +82,13 @@ public class DecoderTest {
         assertThat(p24, not(empty()));
     }
 
-//    @Test
-//    public void readCashEvents() {
-//        Decoder decoder = new Decoder();
-//        List<Event> cash = decoder.readCash();
-//        assertThat(cash, not(empty()));
-//    }
-//
+    @Test
+    public void readCashEvents() {
+        Decoder decoder = new Decoder();
+        List<Event> cash = decoder.readCash();
+        assertThat(cash, not(empty()));
+    }
+
 //    @Test
 //    public void updateCashStoreFile() {
 //

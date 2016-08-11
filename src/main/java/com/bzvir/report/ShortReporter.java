@@ -1,30 +1,21 @@
 package com.bzvir.report;
 
 import com.burtyka.cash.core.Account;
-import com.burtyka.cash.core.Transaction;
-import com.burtyka.cash.core.TransactionManager;
 
 import java.util.List;
 
 /**
- * Created by bohdan on 10.04.16.
+ * Created by bohdan.
  */
 public class ShortReporter {
 
-    private Account account;
-    private TransactionManager transactionManager;
+    private Account expense;
 
-    public ShortReporter(Account account, TransactionManager transactionManager) {
-        if (account == null || transactionManager == null) {
-            throw new IllegalArgumentException();
-        }
-        this.account = account;
-        this.transactionManager = transactionManager;
+    public ShortReporter(Account expense) {
+        this.expense = expense;
     }
 
     public String doReport() {
-        Account expense = getExpenseAccount();
-
         if (expense == null
                 || expense.getItems() == null
                 || expense.getItems().isEmpty()) {
@@ -32,16 +23,6 @@ public class ShortReporter {
         }
         StringBuffer report = new StringBuffer();
         return printExpenses(expense.getItems(), report);
-    }
-
-    private Account getExpenseAccount() {
-        List<Account> items = account.getItems();
-        for (Account item : items) {
-            if (item.getName().contains("expenses")) {
-                return item;
-            }
-        }
-        return null;
     }
 
     private String printExpenses(List<Account> items, StringBuffer report) {
@@ -65,9 +46,9 @@ public class ShortReporter {
     }
 
     private void printTransactions(String id, StringBuffer report) {
-        List<Transaction> transactions = transactionManager.getTransasctions();
-        transactions.stream()
-                .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
-                .forEach(trans -> report.append(trans).append("\n"));
+         report
+                 .append("\n")
+                 .append(id)
+                 .append("\n");
     }
 }
