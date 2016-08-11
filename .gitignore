@@ -1,3 +1,4 @@
+.gitignore
 src/main/java/org/
 .idea/
 cash-decoders.iml
