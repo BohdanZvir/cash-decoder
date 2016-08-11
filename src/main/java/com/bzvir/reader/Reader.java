@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by bohdan on 20.06.16.
+ * Created by bohdan.
  */
 public interface Reader {
 
@@ -21,6 +21,6 @@ public interface Reader {
     Set<String> getRowTitles();
     List<String> readRowTitles();
     boolean checkOnRowTitles();
-    List<Event> loadData(Set<String> titles) throws Exception;
+    List<Event> loadData(Set<String> titles);
     Event constructEvent(Row row);
 }

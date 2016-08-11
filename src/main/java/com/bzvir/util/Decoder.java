@@ -1,27 +1,43 @@
 package com.bzvir.util;
 
 import com.burtyka.cash.core.*;
+import com.bzvir.model.Event;
+import com.bzvir.reader.Privat24XlsReader;
+import com.bzvir.reader.Reader;
 import com.bzvir.report.ShortReporter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.unsynchronized.jdeserialize;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.*;
 
 public class Decoder {
 
-    private static String dirPath = System.getProperty("user.dir") + "/sample data/";
+    private static String dirPath;
+    private static ResourceBundle resourceBundle;
 
-    private static Map<Class, String> files = new HashMap<Class, String>();
+    private static Map<Class, String> files = new HashMap<>();
     static {
         files.put(Settings.class, "settings.dat");
         files.put(Account.class, "account.dat");
         files.put(CurrencyManager.class, "currencyManager.dat");
         files.put(TransactionManager.class, "transactionManager.dat");
+    }
+
+    private Reader p24Reader;
+//    private Reader cashReader;
+
+    public Decoder() {
+        resourceBundle = ResourceBundle.getBundle("application");
+        dirPath = System.getProperty("user.dir")
+                + resourceBundle.getString("sample.dir") + "/";
+        String p24File = dirPath + resourceBundle.getString("p24.file");
+        p24Reader = new Privat24XlsReader(p24File);
+//        cashReader = new CashReader(dirPath);
     }
 
     private static void printJsonValue(Object object) {
@@ -64,7 +80,7 @@ public class Decoder {
 
 	private static void jDeserial(String filePath) {
 
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
         args.add(filePath);
 
         ConsoleOutputCapturer capturer = new ConsoleOutputCapturer();
@@ -103,4 +119,15 @@ public class Decoder {
 //        printJsonValue(account);
     }
 
+    public List<Event> readP24() {
+        Set<String> titles = p24Reader.getRowTitles();
+        return p24Reader.loadData(titles);
+    }
+
+//    public List<Event> readCash() {
+//        Account account = getValue(Account.class);
+//        TransactionManager transactionManager = getValue(TransactionManager.class);
+//
+//        return null;
+//    }
 }

@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 /**
- * Created by bohdan on 18.06.16.
+ * Created by bohdan.
  */
 public class DecoderTest {
     private final String SAMPLE_DIR = System.getProperty("user.dir") + "/sample data/";
@@ -76,4 +76,22 @@ public class DecoderTest {
         assertThat(event.getProperty("Валюта картки"), instanceOf(String.class));
     }
 
+    @Test
+    public void readP24Events() {
+        Decoder decoder = new Decoder();
+        List<Event> p24 = decoder.readP24();
+        assertThat(p24, not(empty()));
+    }
+
+//    @Test
+//    public void readCashEvents() {
+//        Decoder decoder = new Decoder();
+//        List<Event> cash = decoder.readCash();
+//        assertThat(cash, not(empty()));
+//    }
+//
+//    @Test
+//    public void updateCashStoreFile() {
+//
+//    }
 }

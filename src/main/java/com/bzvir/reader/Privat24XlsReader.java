@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 /**
- * Created by bohdan on 20.06.16.
+ * Created by bohdan.
  */
 public class Privat24XlsReader implements Reader {
 
@@ -50,12 +50,13 @@ public class Privat24XlsReader implements Reader {
             FileInputStream file = new FileInputStream(new File(filePath));
             wb = new HSSFWorkbook(file);  //-xls
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return wb.getSheetAt(0);
+        if (wb != null) {
+            return wb.getSheetAt(0);
+        }
+        return null;
     }
 
     @Override
@@ -86,10 +87,10 @@ public class Privat24XlsReader implements Reader {
     }
 
     @Override
-    public List<Event> loadData(Set<String> titles) throws Exception {
+    public List<Event> loadData(Set<String> titles)  {
         List<String> rawTitles = readRowTitles();
         if (!rawTitles.containsAll(getRowTitles())) {
-            throw new Exception("Privat24 dump has wrong format.");
+            throw new RuntimeException("Privat24 dump has wrong format.");
         }
         List<Event> events = new LinkedList<>();
         for (int i = 2; i < sheet.getLastRowNum(); i++) {
