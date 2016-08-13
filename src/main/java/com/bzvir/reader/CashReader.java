@@ -61,17 +61,13 @@ public class CashReader implements Reader {
                 "Валюта картки"));
     }
 
-    public List<String> readRowTitles() {
-        return null;
-    }
-
     @Override
     public boolean checkTitlesOnPresence() {
-        return false;
+        return true;
     }
 
     @Override
-    public List<Event> loadData(Set<String> titles) {
+    public List<Event> loadData() {
         Account expense = getExpenseAccount();
 
         if (expense == null
@@ -134,18 +130,5 @@ public class CashReader implements Reader {
     @Override
     public Map<Category, Double> collectByCategories(LocalDate timeStart, LocalDate timeEnd) {
         return null;
-    }
-
-    public static void main(String[] args) {
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("application");
-        CashReader reader = new CashReader(System.getProperty("user.dir")
-                + resourceBundle.getString("sample.dir") + "/");
-        Settings settings = reader.getValue(Settings.class);
-        Account account = reader.getValue(Account.class);
-        TransactionManager transactionManager = reader.getValue(TransactionManager.class);
-        CurrencyManager currencyManager = reader.getValue(CurrencyManager.class);
-
-        String report = new ShortReporter(account).doReport();
-        System.out.println(report);
     }
 }

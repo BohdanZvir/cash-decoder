@@ -56,8 +56,7 @@ public class DecoderTest extends AbstractTest {
 
     @Test
     public void loadData() throws Exception {
-        Set<String> titles = reader.getTitles();
-        List<Event> data = reader.loadData(titles);
+        List<Event> data = reader.loadData();
         assertThat(data, not(empty()));
         assertThat(data, everyItem(instanceOf(Event.class)));
     }

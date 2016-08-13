@@ -81,7 +81,7 @@ public class Privat24XlsReader implements Reader {
     }
 
     @Override
-    public List<Event> loadData(Set<String> titles)  {
+    public List<Event> loadData()  {
         List<String> rawTitles = readRowTitles();
         if (!rawTitles.containsAll(getTitles())) {
             throw new RuntimeException("Privat24 dump has wrong format.");

@@ -16,5 +16,5 @@ public interface Reader {
     Map<Category,Double> collectByCategories(LocalDate timeStart, LocalDate timeEnd);
     Set<String> getTitles();
     boolean checkTitlesOnPresence();
-    List<Event> loadData(Set<String> titles);
+    List<Event> loadData();
 }

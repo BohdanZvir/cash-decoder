@@ -79,12 +79,10 @@ public class Decoder {
     }
 
     public List<Event> readP24() {
-        Set<String> titles = p24Reader.getTitles();
-        return p24Reader.loadData(titles);
+        return p24Reader.loadData();
     }
 
     public List<Event> readCash() {
-        Set<String> titles = cashReader.getTitles();
-        return cashReader.loadData(titles);
+        return cashReader.loadData();
     }
 }
