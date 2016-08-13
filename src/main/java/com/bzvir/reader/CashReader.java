@@ -33,6 +33,11 @@ public class CashReader implements Reader {
         init();
     }
 
+    private void init() {
+        account = getValue(Account.class);
+        transactionManager = getValue(TransactionManager.class);
+    }
+
     public <T> T getValue(Class<T> clazz) {
         String filename = files.get(clazz);
         String filePath = dirPath + filename;
@@ -45,11 +50,6 @@ public class CashReader implements Reader {
         return null;
     }
 
-    private void init() {
-        account = getValue(Account.class);
-        transactionManager = getValue(TransactionManager.class);
-    }
-
     @Override
     public Set<String> getTitles() {
         return new LinkedHashSet<>(Arrays.asList(
@@ -57,9 +57,8 @@ public class CashReader implements Reader {
                 "Дата",
                 "Час",
                 "Опис операції",
-                "Категорія", /*"Картка",*/
-                "Валюта картки"/*, "Сума у валюті транзакції", "Валюта транзакції",
-                "Залишок на кінець періоду", "Валюта залишку"*/));
+                "Категорія",
+                "Валюта картки"));
     }
 
     public List<String> readRowTitles() {
@@ -87,9 +86,15 @@ public class CashReader implements Reader {
         return events;
     }
 
-
     public Event constructEvent(Account account, Transaction transaction) {
         Event event = new Event();
+        event.setProperty("Категорія", account.getName());
+        event.setProperty("Дата", transaction.getDate());
+        event.setProperty("Час", "");
+        event.setProperty("Сума у валюті картки", transaction.getAmount());
+        event.setProperty("Опис операції", transaction.getDescription());
+        event.setProperty("Валюта картки", account.getCurrencyId());
+        event.setProperty("accountId", account.getId());
         return event;
     }
 
@@ -119,14 +124,12 @@ public class CashReader implements Reader {
     }
 
     private void printTransactions(Account item, LinkedList<Event> events) {
-
         String id = item.getId();
         List<Transaction> transactions = transactionManager.getTransasctions();
         transactions.stream()
                 .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
                 .forEach(trans -> events.add(constructEvent(item, trans)));
     }
-
 
     @Override
     public Map<Category, Double> collectByCategories(LocalDate timeStart, LocalDate timeEnd) {

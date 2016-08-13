@@ -1,20 +1,63 @@
 package com.bzvir.util;
 
 import com.burtyka.cash.core.Account;
+import com.burtyka.cash.core.Transaction;
 import com.burtyka.cash.core.TransactionManager;
 import com.bzvir.reader.CashReader;
 import com.bzvir.report.ShortReporter;
+
+import java.util.ArrayList;
 
 /**
  * Created by bohdan.
  */
 public class AbstractTest {
 
-    final static String SAMPLE_DIR = System.getProperty("user.dir") + "/sample data/";
+    protected final static String SAMPLE_DIR = System.getProperty("user.dir") + "/sample data/";
 
     protected static ShortReporter constructShortReporter() {
         Account account = new CashReader(SAMPLE_DIR).getValue(Account.class);
 //        TransactionManager manager = Decoder.getValue(TransactionManager.class);
         return new ShortReporter(account);
+    }
+
+    protected static class AccountBuilder {
+
+        private AccountBuilder() {}
+
+        public static Account build() {
+//            Account(accountDirection=2, color=, accountList=null, currencyId=default,
+//              description=, id=6ca510bd-28ca-45a1-93ab-e45797d2832e, items=[],
+//              name=@string/leisure_activities)
+            Account account = new Account();
+            account.setAccountDirection(2);
+            account.setColor(-8119082);
+            account.setCurrencyId("default");
+            account.setDescription("");
+            account.setId("6ca510bd-28ca-45a1-93ab-e45797d2832e");
+            account.setItems(new ArrayList<>());
+            account.setName("@string/leisure_activities");
+            return account;
+        }
+    }
+
+    protected static class TransactionBuilder {
+
+        private TransactionBuilder() {}
+
+        public static Transaction build() {
+//          Transaction(amount=26.0, exchangeRate=1.0, date=2014-09-05, description=ратуша віра,
+//              fromAccountId=6ca510bd-28ca-45a1-93ab-e45797d2832e, id=16251eef-710b-46f7-93bf-2177dd7ae4b8,
+//              toAccountId=13f0d705-d997-449b-9994-0fbc546f6e1e)
+            Transaction transaction = new Transaction();
+            transaction.setAmount(26.0);
+            transaction.setExchangeRate(1.0F);
+            transaction.setDate("2014-09.05");
+            transaction.setFromAccountId("6ca510bd-28ca-45a1-93ab-e45797d2832e");
+            transaction.setId("16251eef-710b-46f7-93bf-2177dd7ae4b8");
+            transaction.setToAccountId("13f0d705-d997-449b-9994-0fbc546f6e1e");
+            transaction.setDescription("ратуша віра");
+            return transaction;
+        }
     }
 }
