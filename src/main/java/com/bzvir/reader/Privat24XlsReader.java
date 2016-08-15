@@ -81,12 +81,12 @@ public class Privat24XlsReader implements Reader {
     }
 
     @Override
-    public List<Event> loadData()  {
+    public Set<Event> loadData()  {
         List<String> rawTitles = readRowTitles();
         if (!rawTitles.containsAll(getTitles())) {
             throw new RuntimeException("Privat24 dump has wrong format.");
         }
-        List<Event> events = new LinkedList<>();
+        Set<Event> events = new HashSet<>();
         for (int i = 2; i < sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             events.add(constructEvent(row));

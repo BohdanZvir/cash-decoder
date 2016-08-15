@@ -3,7 +3,6 @@ package com.bzvir.reader;
 import com.burtyka.cash.core.*;
 import com.bzvir.model.Category;
 import com.bzvir.model.Event;
-import com.bzvir.report.ShortReporter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,19 +66,16 @@ public class CashReader implements Reader {
     }
 
     @Override
-    public List<Event> loadData() {
+    public Set<Event> loadData() {
         Account expense = getExpenseAccount();
 
         if (expense == null
                 || expense.getItems() == null
                 || expense.getItems().isEmpty()) {
-            return new ArrayList<>();
+            return new HashSet<>();
         }
         List<Account> items = expense.getItems();
-
-        LinkedList<Event> events = new LinkedList<>();
-        aggregateEvents(items, events);
-        return events;
+        return aggregateEvents(items, new HashSet<>());
     }
 
     public Event constructEvent(Account account, Transaction transaction) {
@@ -104,27 +100,48 @@ public class CashReader implements Reader {
         return null;
     }
 
-    private String aggregateEvents(List<Account> items, LinkedList<Event> events) {
+    public Set<Event> aggregateEvents(List<Account> items, Set<Event> events) {
+        Set<Event> list;
         for (Account item : items) {
             if (isParent(item)) {
-                aggregateEvents(item.getItems(), events);
+                list = aggregateEvents(item.getItems(), events);
             } else {
-                printTransactions(item, events);
+                list = findTransactions(item, events);
             }
+            events.addAll(list);
         }
-        return events.toString();
+        return events;
     }
 
     private boolean isParent(Account account) {
-        return account.getItems() !=null && !account.getItems().isEmpty();
+        boolean bool = account.getItems() != null && !account.getItems().isEmpty();
+        if (bool){
+            System.out.println();
+        }
+        return bool;
     }
 
-    private void printTransactions(Account item, LinkedList<Event> events) {
+    public Set<Event> findTransactions(Account item, Set<Event> events) {
         String id = item.getId();
-        List<Transaction> transactions = transactionManager.getTransasctions();
-        transactions.stream()
-                .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
-                .forEach(trans -> events.add(constructEvent(item, trans)));
+        List<Transaction> transactions = getTransactions();
+        for (Transaction trans : transactions) {
+            if (trans.getFromAccountId().equalsIgnoreCase(id)) {
+                Event event = constructEvent(item, trans);
+                events.add(event);
+            }
+        }
+        return events;
+
+//        transactions.stream()
+//                .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
+//                .forEach(trans -> {
+//                    Event event = constructEvent(item, trans);
+//                    events.add(event);
+//                });
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactionManager.getTransasctions();
     }
 
     @Override

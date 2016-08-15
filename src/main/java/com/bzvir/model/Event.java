@@ -1,14 +1,16 @@
 package com.bzvir.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Created by bohdan on 17.07.16.
+ * Created by bohdan.
  */
 @ToString
+@EqualsAndHashCode
 public class Event {
     private Map<String, Object> data;
 

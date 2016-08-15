@@ -56,7 +56,7 @@ public class DecoderTest extends AbstractTest {
 
     @Test
     public void loadData() throws Exception {
-        List<Event> data = reader.loadData();
+        Set<Event> data = reader.loadData();
         assertThat(data, not(empty()));
         assertThat(data, everyItem(instanceOf(Event.class)));
     }
@@ -77,14 +77,14 @@ public class DecoderTest extends AbstractTest {
     @Test
     public void readP24Events() {
         Decoder decoder = new Decoder();
-        List<Event> p24 = decoder.readP24();
+        Set<Event> p24 = decoder.readP24();
         assertThat(p24, not(empty()));
     }
 
     @Test
     public void readCashEvents() {
         Decoder decoder = new Decoder();
-        List<Event> cash = decoder.readCash();
+        Set<Event> cash = decoder.readCash();
         assertThat(cash, not(empty()));
     }
 
