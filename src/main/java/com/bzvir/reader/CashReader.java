@@ -113,31 +113,27 @@ public class CashReader implements Reader {
         return events;
     }
 
-    private boolean isParent(Account account) {
-        boolean bool = account.getItems() != null && !account.getItems().isEmpty();
-        if (bool){
-            System.out.println();
-        }
-        return bool;
+    protected static boolean isParent(Account account) {
+        return account.getItems() != null && !account.getItems().isEmpty();
     }
 
     public Set<Event> findTransactions(Account item, Set<Event> events) {
         String id = item.getId();
         List<Transaction> transactions = getTransactions();
-        for (Transaction trans : transactions) {
-            if (trans.getFromAccountId().equalsIgnoreCase(id)) {
-                Event event = constructEvent(item, trans);
-                events.add(event);
-            }
-        }
-        return events;
+//        for (Transaction trans : transactions) {
+//            if (trans.getFromAccountId().equalsIgnoreCase(id)) {
+//                Event event = constructEvent(item, trans);
+//                events.add(event);
+//            }
+//        }
 
-//        transactions.stream()
-//                .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
-//                .forEach(trans -> {
-//                    Event event = constructEvent(item, trans);
-//                    events.add(event);
-//                });
+        transactions.stream()
+                .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
+                .forEach(trans -> {
+                    Event event = constructEvent(item, trans);
+                    events.add(event);
+                });
+        return events;
     }
 
     public List<Transaction> getTransactions() {

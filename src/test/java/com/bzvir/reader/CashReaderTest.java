@@ -41,6 +41,28 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
+    public void checkIsParentOnSimpleAccount() {
+        boolean parent = CashReader.isParent(new Account());
+
+        assertFalse(parent);
+    }
+
+    @Test
+    public void checkIsParentOnAccountWithTwoChilds() {
+        Account child_1 = new Account();
+        Account child_2 = new Account();
+        Account parent = new Account();
+        parent.setItems(Arrays.asList(child_1, child_2));
+
+        boolean isParent = CashReader.isParent(parent);
+
+        assertTrue(isParent);
+    }
+
+    // parent account has two child accounts,
+    // first child account has three transactions,
+    // second child account has one transaction.
+    @Test
     public void aggregateEventsFromParentAccount() {
 
         Account item1 = new Account();
