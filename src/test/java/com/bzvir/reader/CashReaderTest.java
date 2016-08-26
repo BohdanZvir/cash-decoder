@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by bohdan.
@@ -107,18 +108,13 @@ public class CashReaderTest extends AbstractTest {
         trans4.setId("22311e13-e7ed-47e5-84d2-3639a96bfe62");
         trans4.setToAccountId("13f0d705-d997-449b-9994-0fbc546f6e1e");
 
-        //TODO: use mock
-        CashReader reader = //Mockito.mock(CashReader.class);
-        new CashReader(SAMPLE_DIR);
-//        when(reader.getTransactions()).thenReturn(Arrays.asList(trans1, trans2, trans3, trans4));
+        CashReader reader = spy(new CashReader(SAMPLE_DIR));
+        doReturn(Arrays.asList(trans1, trans2, trans3, trans4)).when(reader).getTransactions();
 
         List<Account> accounts = Collections.singletonList(account);
-
         Set<Event> events = reader.aggregateEvents(accounts, new HashSet<>());
 
-//        assertThat(events, hasSize(4));
-//        verify(reader.getTransactions());
-        assertThat(events, hasSize(30));
+        assertThat(events, hasSize(4));
     }
 
 }
