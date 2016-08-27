@@ -4,6 +4,8 @@ import com.burtyka.cash.core.Account;
 
 import java.util.List;
 
+import static com.bzvir.reader.CashReader.isParent;
+
 /**
  * Created by bohdan.
  */
@@ -39,10 +41,6 @@ public class ShortReporter {
             }
         }
         return report.toString();
-    }
-
-    private boolean isParent(Account account) {
-        return account.getItems() !=null && !account.getItems().isEmpty();
     }
 
     private void printTransactions(String id, StringBuffer report) {

@@ -72,7 +72,7 @@ public class CashReader implements Reader {
         if (expense == null
                 || expense.getItems() == null
                 || expense.getItems().isEmpty()) {
-            return new HashSet<>();
+            throw new RuntimeException("There are no items to work with.");
         }
         List<Account> items = expense.getItems();
         return aggregateEvents(items, new HashSet<>());
@@ -113,20 +113,13 @@ public class CashReader implements Reader {
         return events;
     }
 
-    protected static boolean isParent(Account account) {
+    public static boolean isParent(Account account) {
         return account.getItems() != null && !account.getItems().isEmpty();
     }
 
     public Set<Event> findTransactions(Account item, Set<Event> events) {
         String id = item.getId();
         List<Transaction> transactions = getTransactions();
-//        for (Transaction trans : transactions) {
-//            if (trans.getFromAccountId().equalsIgnoreCase(id)) {
-//                Event event = constructEvent(item, trans);
-//                events.add(event);
-//            }
-//        }
-
         transactions.stream()
                 .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
                 .forEach(trans -> {

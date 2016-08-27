@@ -24,17 +24,6 @@ public class Privat24XlsReader implements Reader {
         sheet = loadFirstSheet(filePath);
     }
 
-    public Map<String, String> readFile(String filePath) {
-        Iterator<Row> rowIterator = sheet.iterator();
-        rowIterator.hasNext();
-        Row row = rowIterator.next();
-
-        Iterator<Cell> cellIterator = row.cellIterator();
-
-        Map<String, String> map = new HashMap<>();
-        return map;
-    }
-
     @Override
     public Map<Category, Double> collectByCategories(LocalDate timeStart, LocalDate timeEnd) {
         return null;
@@ -48,22 +37,24 @@ public class Privat24XlsReader implements Reader {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (wb != null) {
-            return wb.getSheetAt(0);
-        }
-        return null;
+        return (wb != null) ? wb.getSheetAt(0) : null;
     }
 
     @Override
     public Set<String> getTitles() {
         return new LinkedHashSet<>(Arrays.asList(
-                "Сума у валюті картки",
+                "Категорія",
                 "Дата",
                 "Час",
+                "Сума у валюті картки",
                 "Опис операції",
-                "Категорія", /*"Картка",*/
-                "Валюта картки"/*, "Сума у валюті транзакції", "Валюта транзакції",
-                "Залишок на кінець періоду", "Валюта залишку"*/));
+                "Валюта картки"
+//                "Картка",
+//                "Сума у валюті транзакції",
+//                "Валюта транзакції",
+//                "Залишок на кінець періоду",
+//                "Валюта залишку"
+        ));
     }
 
     private List<String> readRowTitles() {
