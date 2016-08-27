@@ -3,6 +3,7 @@ package com.bzvir.util;
 import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
 import com.burtyka.cash.core.TransactionManager;
+import com.bzvir.model.Event;
 import com.bzvir.reader.CashReader;
 import com.bzvir.report.ShortReporter;
 
@@ -46,9 +47,6 @@ public class AbstractTest {
         private TransactionBuilder() {}
 
         public static Transaction build() {
-//          Transaction(amount=26.0, exchangeRate=1.0, date=2014-09-05, description=ратуша віра,
-//              fromAccountId=6ca510bd-28ca-45a1-93ab-e45797d2832e, id=16251eef-710b-46f7-93bf-2177dd7ae4b8,
-//              toAccountId=13f0d705-d997-449b-9994-0fbc546f6e1e)
             Transaction transaction = new Transaction();
             transaction.setAmount(26.0);
             transaction.setExchangeRate(1.0F);
@@ -59,5 +57,27 @@ public class AbstractTest {
             transaction.setDescription("ратуша віра");
             return transaction;
         }
+    }
+
+
+    protected Event createEvent(String category, String data, String time, String description) {
+        Event event = new Event();
+        event.setProperty("Категорія", category);
+        event.setProperty("Дата", data);
+        event.setProperty("Час", time);
+        event.setProperty("Сума у валюті картки", 10.0);
+        event.setProperty("Опис операції", description);
+        event.setProperty("Валюта картки", "default");
+        return event;
+    }
+
+    protected Event createPrivat24Event(String category, String data, String time, String description) {
+        return createEvent(category, data, time, description);
+    }
+
+    protected Event createCashEvent(String category, String data, String description) {
+        Event cash = createEvent(category, data, "", description);
+        cash.setProperty("accountId", "6ca510bd-28ca-45a1-93ab-e45797d2832e");
+        return cash;
     }
 }
