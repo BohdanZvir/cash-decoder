@@ -87,10 +87,12 @@ public class Privat24XlsReader implements Reader {
 
     public Event constructEvent(Row row) {
         Event event = new Event();
-        List<String> actual = readRowTitles();
+        List<String> p24Titles = readRowTitles();
+
         for (String title : getTitles()) {
-            int index = actual.indexOf(title);
+            int index = p24Titles.indexOf(title);
             Cell cell = row.getCell(index);
+
             int cellType = cell.getCellType();
             if (cellType == Cell.CELL_TYPE_STRING) {
                 event.setProperty(title, cell.getStringCellValue());
