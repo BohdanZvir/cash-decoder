@@ -2,10 +2,7 @@ package com.bzvir.util;
 
 import com.bzvir.model.Event;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -13,6 +10,14 @@ import java.util.stream.Collectors;
  */
 public class EventJoiner {
 
+
+    private Map<String, String> categoryMap;
+
+    public EventJoiner(){
+        categoryMap = new HashMap<>();
+        categoryMap.put("Перекази", "transfers");
+        categoryMap.put("Оренда", "rent");
+    }
 
     public Set<Event> join(List<Event> cash, List<Event> privat24) {
         Set<Event> result = new LinkedHashSet<>(cash);
@@ -24,12 +29,8 @@ public class EventJoiner {
 
         return privat24.stream().map(event -> {
             Object category = event.getProperty("Категорія");
-            if (category != null ) {
-                if (category.equals("Перекази")) {
-                    event.setProperty("Категорія", "transfers");
-                } else if (category.equals("Оренда")) {
-                    event.setProperty("Категорія", "rent");
-                }
+            if (category != null && categoryMap.containsKey(category)) {
+                event.setProperty("Категорія", categoryMap.get(category));
             }
             return event;
         }).collect(Collectors.toList());
