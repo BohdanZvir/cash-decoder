@@ -24,8 +24,12 @@ public class EventJoiner {
 
         return privat24.stream().map(event -> {
             Object category = event.getProperty("Категорія");
-            if (category != null && category.equals("Перекази")) {
-                event.setProperty("Категорія", "transfers");
+            if (category != null ) {
+                if (category.equals("Перекази")) {
+                    event.setProperty("Категорія", "transfers");
+                } else if (category.equals("Оренда")) {
+                    event.setProperty("Категорія", "rent");
+                }
             }
             return event;
         }).collect(Collectors.toList());
