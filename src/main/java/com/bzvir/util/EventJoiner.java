@@ -2,6 +2,10 @@ package com.bzvir.util;
 
 import com.bzvir.model.Event;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,13 +14,33 @@ import java.util.stream.Collectors;
  */
 public class EventJoiner {
 
-
     private Map<String, String> categoryMap;
 
     public EventJoiner(){
         categoryMap = new HashMap<>();
-        categoryMap.put("Перекази", "transfers");
-        categoryMap.put("Оренда", "rent");
+        loadCategoryMap();
+    }
+
+    protected void loadCategoryMap() {
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL csvUrl = classLoader.getResource("category_mapping.csv");
+        if (csvUrl == null) {
+            return;
+        }
+        String csvFile = csvUrl.getFile();
+        String line;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            br.readLine(); // pass headers
+            while ((line = br.readLine()) != null) {
+                String[] value = line.split(",");
+                categoryMap.put(value[0], value[1]);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Set<Event> join(List<Event> cash, List<Event> privat24) {
