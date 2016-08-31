@@ -2,7 +2,6 @@ package com.bzvir.util;
 
 import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
-import com.burtyka.cash.core.TransactionManager;
 import com.bzvir.model.Event;
 import com.bzvir.reader.CashReader;
 import com.bzvir.report.ShortReporter;
@@ -71,12 +70,12 @@ public class AbstractTest {
         return event;
     }
 
-    protected Event createPrivat24Event(String category, String data, String time, String description) {
-        return createEvent(category, data, time, description);
+    protected Event createPrivat24Event(String category, String description) {
+        return createEvent(category, "", "", description);
     }
 
-    protected Event createCashEvent(String category, String data, String description) {
-        Event cash = createEvent(category, data, "", description);
+    protected Event createCashEvent(String category, String description) {
+        Event cash = createEvent(category, "", "", description);
         cash.setProperty("accountId", "6ca510bd-28ca-45a1-93ab-e45797d2832e");
         return cash;
     }
