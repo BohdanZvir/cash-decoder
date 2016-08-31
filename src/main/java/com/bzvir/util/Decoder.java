@@ -78,11 +78,11 @@ public class Decoder {
 //        Class loadedClass = generator.generateClassDeclarations(dataFilePath);
     }
 
-    public Set<Event> readP24() {
+    public List<Event> readP24() {
         return p24Reader.loadData();
     }
 
-    public Set<Event> readCash() {
+    public List<Event> readCash() {
         return cashReader.loadData();
     }
 }

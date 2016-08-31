@@ -66,7 +66,7 @@ public class CashReader implements Reader {
     }
 
     @Override
-    public Set<Event> loadData() {
+    public List<Event> loadData() {
         Account expense = getExpenseAccount();
 
         if (expense == null
@@ -75,7 +75,7 @@ public class CashReader implements Reader {
             throw new RuntimeException("There are no items to work with.");
         }
         List<Account> items = expense.getItems();
-        return aggregateEvents(items, new HashSet<>());
+        return aggregateEvents(items, new LinkedList<>());
     }
 
     public Event constructEvent(Account account, Transaction transaction) {
@@ -100,8 +100,8 @@ public class CashReader implements Reader {
         return null;
     }
 
-    public Set<Event> aggregateEvents(List<Account> items, Set<Event> events) {
-        Set<Event> list;
+    public List<Event> aggregateEvents(List<Account> items, List<Event> events) {
+        List<Event> list;
         for (Account item : items) {
             if (isParent(item)) {
                 list = aggregateEvents(item.getItems(), events);
@@ -117,7 +117,7 @@ public class CashReader implements Reader {
         return account.getItems() != null && !account.getItems().isEmpty();
     }
 
-    public Set<Event> findTransactions(Account item, Set<Event> events) {
+    public List<Event> findTransactions(Account item, List<Event> events) {
         String id = item.getId();
         List<Transaction> transactions = getTransactions();
         transactions.stream()

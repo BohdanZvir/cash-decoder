@@ -33,10 +33,9 @@ public class CashReaderTest extends AbstractTest {
     @Test
     public void loadDataIntoEventList() {
         CashReader reader = new CashReader(SAMPLE_DIR);
-        Set<Event> events = reader.loadData();
+        List<Event> events = reader.loadData();
 
         assertThat(events, hasSize(greaterThan(100)));
-        events.forEach(System.out::println);
         System.out.println("size :: " + events.size());
     }
 
@@ -134,7 +133,7 @@ public class CashReaderTest extends AbstractTest {
         doReturn(Arrays.asList(trans1, trans2, trans3, trans4)).when(reader).getTransactions();
 
         List<Account> accounts = Collections.singletonList(account);
-        Set<Event> events = reader.aggregateEvents(accounts, new HashSet<>());
+        List<Event> events = reader.aggregateEvents(accounts, new LinkedList<>());
 
         assertThat(events, hasSize(4));
     }

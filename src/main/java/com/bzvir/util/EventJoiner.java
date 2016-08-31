@@ -32,8 +32,11 @@ public class EventJoiner {
         String line;
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            br.readLine(); // pass headers
             while ((line = br.readLine()) != null) {
+                if (!line.isEmpty()
+                        && (line.contains("Cash") || line.contains("Privat24"))) {
+                    continue;
+                }
                 String[] value = line.split(",");
                 categoryMap.put(value[0], value[1]);
             }
@@ -43,8 +46,8 @@ public class EventJoiner {
         }
     }
 
-    public Set<Event> join(List<Event> cash, List<Event> privat24) {
-        Set<Event> result = new LinkedHashSet<>(cash);
+    public List<Event> join(List<Event> cash, List<Event> privat24) {
+        List<Event> result = new LinkedList<>(cash);
         result.addAll(mapCategory(privat24));
         return result;
     }
