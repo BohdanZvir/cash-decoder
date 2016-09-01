@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by bohdan.
@@ -75,7 +76,7 @@ public class CashReader implements Reader {
             throw new RuntimeException("There are no items to work with.");
         }
         List<Account> items = expense.getItems();
-        return aggregateEvents(items, new LinkedList<>());
+        return aggregateEvents(items);
     }
 
     public Event constructEvent(Account account, Transaction transaction) {
@@ -100,13 +101,14 @@ public class CashReader implements Reader {
         return null;
     }
 
-    public List<Event> aggregateEvents(List<Account> items, List<Event> events) {
+    public List<Event> aggregateEvents(List<Account> items) {
+        List<Event> events = new ArrayList<>();
         List<Event> list;
         for (Account item : items) {
             if (isParent(item)) {
-                list = aggregateEvents(item.getItems(), events);
+                list = aggregateEvents(item.getItems());
             } else {
-                list = findTransactions(item, events);
+                list = findTransactions(item);
             }
             events.addAll(list);
         }
@@ -117,16 +119,12 @@ public class CashReader implements Reader {
         return account.getItems() != null && !account.getItems().isEmpty();
     }
 
-    public List<Event> findTransactions(Account item, List<Event> events) {
+    public List<Event> findTransactions(Account item) {
         String id = item.getId();
-        List<Transaction> transactions = getTransactions();
-        transactions.stream()
+        return getTransactions().stream()
                 .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
-                .forEach(trans -> {
-                    Event event = constructEvent(item, trans);
-                    events.add(event);
-                });
-        return events;
+                .map(trans ->  constructEvent(item, trans))
+                .collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactions() {

@@ -58,7 +58,28 @@ public class AbstractTest {
         }
     }
 
+    //create account with empty list of items and empty description
+    protected Account createAccount(String id, String category) {
+        Account account = new Account();
+        account.setDescription("");
+        account.setId(id);
+        account.setName(category);
+        account.setItems(new ArrayList<>());
+        return account;
+    }
 
+    // create dummy transaction with stubbed id, amount, date, accountToId
+    protected Transaction createTransaction(String childId_1, String description) {
+        Transaction trans = new Transaction();
+        trans.setId("id");
+        trans.setAmount(12.0);
+        trans.setDate("2014-08-20");
+        trans.setDescription(description);
+        trans.setFromAccountId(childId_1);
+        trans.setToAccountId("13f0d705-d997-449b-9994-0fbc546f6e1e");
+        return trans;
+    }
+    //create dummy Event with stybbed amount, currency
     protected Event createEvent(String category, String data, String time, String description) {
         Event event = new Event();
         event.setCategory(category);
