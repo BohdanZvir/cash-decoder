@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 
 /**
@@ -62,7 +63,7 @@ public class EventsJoinerTest extends AbstractTest {
     }
 
     @Test
-    public void groupingEventsByCategories() {
+    public void groupingEventsByCategoriesWithTwoDistinct() {
         String category1 = "cat_1";
         String category2 = "cat_2";
         Event p1_1 = createPrivat24Event(category1, "1");
@@ -78,5 +79,20 @@ public class EventsJoinerTest extends AbstractTest {
         assertThat(events1, hasItem(p1_2));
         List<Event> events2 = result.get(category2);
         assertThat(events2, hasItem(p2_1));
+    }
+
+    @Test
+    public void groupingTwoEventsByCategoriesWithOneDistinct() {
+        String category = "cat";
+        Event p1_1 = createPrivat24Event(category, "1");
+        Event p1_2 = createPrivat24Event(category, "2");
+
+        Map<String, List<Event>> result = eventJoiner.groupByCategory(Arrays.asList(p1_1, p1_2));
+
+        assertThat(result.keySet(), hasItem(category));
+        assertThat(result.keySet(), hasSize(1));
+        List<Event> events1 = result.get(category);
+        assertThat(events1, hasItem(p1_1));
+        assertThat(events1, hasItem(p1_2));
     }
 }
