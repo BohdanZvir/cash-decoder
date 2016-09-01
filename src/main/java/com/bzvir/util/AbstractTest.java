@@ -61,7 +61,7 @@ public class AbstractTest {
 
     protected Event createEvent(String category, String data, String time, String description) {
         Event event = new Event();
-        event.setProperty("Категорія", category);
+        event.setCategory(category);
         event.setProperty("Дата", data);
         event.setProperty("Час", time);
         event.setProperty("Сума у валюті картки", 10.0);
@@ -71,11 +71,11 @@ public class AbstractTest {
     }
 
     protected Event createPrivat24Event(String category, String description) {
-        return createEvent(category, "", "", description);
+        return createEvent(category, "", "", "p24" + description);
     }
 
     protected Event createCashEvent(String category, String description) {
-        Event cash = createEvent(category, "", "", description);
+        Event cash = createEvent(category, "", "", "cash " + description);
         cash.setProperty("accountId", "6ca510bd-28ca-45a1-93ab-e45797d2832e");
         return cash;
     }

@@ -55,11 +55,15 @@ public class EventJoiner {
     private Collection<? extends Event> mapCategory(Collection<Event> privat24) {
 
         return privat24.stream().map(event -> {
-            Object category = event.getProperty("Категорія");
+            String category = event.getCategory();
             if (category != null && categoryMap.containsKey(category)) {
-                event.setProperty("Категорія", categoryMap.get(category));
+                event.setCategory(categoryMap.get(category));
             }
             return event;
         }).collect(Collectors.toList());
+    }
+
+    public Map<String, List<Event>> groupByCategory(List<Event> events) {
+        return events.stream().collect(Collectors.groupingBy(Event::getCategory));
     }
 }

@@ -13,9 +13,18 @@ import java.util.Map;
 @EqualsAndHashCode
 public class Event {
     private Map<String, Object> data;
+    private final static String CATEGORY = "category";
 
     public Event() {
         data = new LinkedHashMap<>();
+    }
+
+    public void setCategory(String value) {
+        data.put(CATEGORY, value);
+    }
+
+    public String getCategory() {
+        return (data.containsKey(CATEGORY)) ? (String) data.get(CATEGORY) : "";
     }
 
     public void setProperty(String key, Object value) {
