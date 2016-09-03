@@ -24,11 +24,6 @@ public class Privat24XlsReader implements Reader {
         sheet = loadFirstSheet(filePath);
     }
 
-    @Override
-    public Map<Category, Double> collectByCategories(LocalDate timeStart, LocalDate timeEnd) {
-        return null;
-    }
-
     public Sheet loadFirstSheet(String filePath) {
         Workbook wb = null;
         try {

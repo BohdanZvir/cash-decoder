@@ -130,9 +130,4 @@ public class CashReader implements Reader {
     public List<Transaction> getTransactions() {
         return transactionManager.getTransasctions();
     }
-
-    @Override
-    public Map<Category, Double> collectByCategories(LocalDate timeStart, LocalDate timeEnd) {
-        return null;
-    }
 }
