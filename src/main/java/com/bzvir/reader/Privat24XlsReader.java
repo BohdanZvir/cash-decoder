@@ -1,6 +1,5 @@
 package com.bzvir.reader;
 
-import com.bzvir.model.Category;
 import com.bzvir.model.Event;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -10,7 +9,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.time.LocalDate;
 import java.util.*;
 
 /**
