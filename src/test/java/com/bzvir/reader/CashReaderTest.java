@@ -4,6 +4,7 @@ import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
 import com.bzvir.model.Event;
 import com.bzvir.util.AbstractTest;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
@@ -19,9 +20,15 @@ import static org.mockito.Mockito.*;
  */
 public class CashReaderTest extends AbstractTest {
 
+    private CashReader reader;
+
+    @Before
+    public void setUp() {
+        reader = new CashReader(SAMPLE_DIR);
+    }
+
     @Test
     public void constructEventFromAccountAndTransaction() {
-        CashReader reader = new CashReader(SAMPLE_DIR);
         Account account = AccountBuilder.build();
         Transaction transaction = TransactionBuilder.build();
 
@@ -32,7 +39,7 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void loadDataIntoEventList() {
-        CashReader reader = new CashReader(SAMPLE_DIR);
+        reader = new CashReader(SAMPLE_DIR);
         List<Event> events = reader.loadData();
 
         assertThat(events, hasSize(greaterThan(100)));
@@ -79,18 +86,14 @@ public class CashReaderTest extends AbstractTest {
         Transaction trans3 = createTransaction(childId_1, "3 child 1");
         Transaction trans4 = createTransaction(childId_2, "4 child 2");
 
-        CashReader reader =
-                spy(
-                new CashReader(SAMPLE_DIR)
-                )
-                ;
+        CashReader spyReader = spy(reader);
         doReturn(Arrays.asList(trans1, trans2, trans3, trans4))
-                .when(reader).getTransactions();
+                .when(spyReader).getTransactions();
 
         List<Account> accounts = Collections.singletonList(parent);
-        List<Event> events = reader.aggregateEvents(accounts);
+        List<Event> events = spyReader.aggregateEvents(accounts);
 
-        verify(reader, times(2)).getTransactions();
+        verify(spyReader, times(2)).getTransactions();
         assertThat(events, hasSize(4));
     }
 
