@@ -180,6 +180,6 @@ public class CashReader implements Reader {
         return account;
     }
 
-        public static final int EXPENSE = 2;
+    private final int EXPENSE = 2;
 
 }
