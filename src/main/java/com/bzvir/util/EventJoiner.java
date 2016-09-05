@@ -63,7 +63,7 @@ public class EventJoiner {
         }).collect(Collectors.toList());
     }
 
-    public Map<String, List<Event>> groupByCategory(List<Event> events) {
+    public static Map<String, List<Event>> groupByCategory(List<Event> events) {
         return events.stream().collect(Collectors.groupingBy(Event::getCategory));
     }
 }

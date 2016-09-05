@@ -53,7 +53,7 @@ public class AbstractTest {
             transaction.setFromAccountId("6ca510bd-28ca-45a1-93ab-e45797d2832e");
             transaction.setId("16251eef-710b-46f7-93bf-2177dd7ae4b8");
             transaction.setToAccountId("13f0d705-d997-449b-9994-0fbc546f6e1e");
-            transaction.setDescription("ратуша віра");
+            transaction.setDescription("ratush");
             return transaction;
         }
     }

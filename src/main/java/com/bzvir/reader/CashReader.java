@@ -1,13 +1,12 @@
 package com.bzvir.reader;
 
 import com.burtyka.cash.core.*;
-import com.bzvir.model.Category;
 import com.bzvir.model.Event;
+import com.bzvir.util.EventJoiner;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,6 +16,7 @@ import java.util.stream.Collectors;
 public class CashReader implements Reader {
 
     private static Map<Class, String> files = new HashMap<>();
+
     static {
         files.put(Settings.class, "settings.dat");
         files.put(Account.class, "account.dat");
@@ -130,4 +130,56 @@ public class CashReader implements Reader {
     public List<Transaction> getTransactions() {
         return transactionManager.getTransasctions();
     }
+
+    @Override
+    public Account reverseConvert(List<Event> p24) {
+        List<Transaction> transactions = null;
+        Map<String, List<Event>> grouped = EventJoiner.groupByCategory(p24);
+        for (Map.Entry<String, List<Event>> entry : grouped.entrySet()) {
+            Account created = createAccount(entry.getKey());
+
+            List<Event> events = entry.getValue();
+            transactions = createTransactions(events, created.getId());
+        }
+        if (transactions != null) {
+            getTransactions().addAll(transactions);
+        }
+        return account;
+    }
+
+    private List<Transaction> createTransactions(List<Event> events, String id) {
+        List<Transaction> list = new ArrayList<>();
+        for (Event event : events) {
+            Transaction transaction = createTransaction(id, event);
+            list.add(transaction);
+        }
+        return list;
+    }
+
+    private Transaction createTransaction(String id, Event event) {
+        Transaction transaction = new Transaction();
+        transaction.setId(UUID.randomUUID().toString());
+        transaction.setToAccountId(id);
+        transaction.setAmount((Double) event.getProperty("Сума у валюті картки"));
+        transaction.setExchangeRate(1.0F);
+        transaction.setDate((String) event.getProperty("Дата"));
+        transaction.setFromAccountId("6ca510bd-28ca-45a1-93ab-e45797d2832e");
+        String time = (String) event.getProperty("Час");
+        transaction.setDescription(event.getProperty("Опис операції") + " " + time);
+        return transaction;
+    }
+
+    private Account createAccount(String category) {
+        Account account = new Account();
+        account.setId(UUID.randomUUID().toString());
+        account.setName(category);
+        account.setAccountDirection(EXPENSE);
+        account.setColor(-8119082);
+        account.setCurrencyId("default");
+        account.setDescription("");
+        return account;
+    }
+
+        public static final int EXPENSE = 2;
+
 }

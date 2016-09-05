@@ -97,4 +97,33 @@ public class CashReaderTest extends AbstractTest {
         assertThat(events, hasSize(4));
     }
 
+    @Test
+    public void convertP24EventToCash() {
+        String parentDesc = "parent";
+        String parentCateg = "cat0";
+        Event parent = createPrivat24Event(parentCateg, parentDesc);
+        List<Event> p24 = Arrays.asList(parent);
+        Account account = reader.reverseConvert(p24);
+
+        assertThat(account.getAccountDirection(), is(2));
+        assertThat(account.getColor(), is(-8119082));
+        assertThat(account.getCurrencyId(), is("default"));
+        assertThat(account.getDescription(), is(parentDesc));
+        assertThat(account.getId(), is("Id"));  //"6ca510bd-28ca-45a1-93ab-e45797d2832e"
+        assertThat(account.getName(), is(parentCateg)); //"@string/leisure_activities"
+    }
+
+    @Test
+    public void convertThreeP24EventsToCash() {
+        Event parent = createPrivat24Event("cat0", "parent");
+        Event child1 = createPrivat24Event("cat1", "child1");
+        Event child2 = createPrivat24Event("cat2", "child2");
+        List<Event> p24 = Arrays.asList(parent, child1, child2);
+
+        CashReader reader = new CashReader(SAMPLE_DIR);
+        Account account = reader.reverseConvert(p24);
+
+        assertThat(account.getItems(), hasSize(2));
+    }
+
 }
