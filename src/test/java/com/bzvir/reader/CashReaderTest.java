@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -124,6 +125,15 @@ public class CashReaderTest extends AbstractTest {
         Account account = reader.reverseConvert(p24);
 
         assertThat(account.getItems(), hasSize(2));
+    }
+
+    @Test
+    public void findAccountByEventCategory() {
+        String category = "medicine";
+
+        Account account = reader.findAccountByCategory(category);
+
+        assertThat(account.getName(), containsString(category));
     }
 
 }

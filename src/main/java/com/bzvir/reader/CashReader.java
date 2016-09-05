@@ -180,6 +180,33 @@ public class CashReader implements Reader {
         return account;
     }
 
+//    static class AccountDirection {
+//    private final int INCOME = 1;
     private final int EXPENSE = 2;
+//    private final int IN_WALLET = 3;
+//    }
 
+    public Account findAccountByCategory(String category, Account account) {
+        if (!isParent(account)) {
+            return null;
+        }
+        List<Account> items = account.getItems();
+        for (Account item : items) {
+            if (item.getName().contains(category)) {
+                return item;
+            } else {
+                Account account1 = findAccountByCategory(category, item);
+                if (account1 == null){
+                    continue;
+                } else {
+                    return account1;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Account findAccountByCategory(String category) {
+        return findAccountByCategory(category, this.account);
+    }
 }
