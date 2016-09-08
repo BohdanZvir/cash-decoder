@@ -211,12 +211,15 @@ public class CashReader implements Reader {
     }
 
     public Account createAccount(Event event) {
-        Account account = new Account();
-        account.setId(UUID.randomUUID().toString());
-        account.setName(event.getCategory());
-        account.setAccountDirection(EXPENSE);
-        account.setCurrencyId("default");
-        account.setDescription("");
+        Account account = findAccountByCategory(event.getCategory());
+        if (account == null) {
+            account = new Account();
+            account.setId(UUID.randomUUID().toString());
+            account.setName(event.getCategory());
+            account.setAccountDirection(EXPENSE);
+            account.setCurrencyId("default");
+            account.setDescription("");
+        }
         return account;
     }
 }
