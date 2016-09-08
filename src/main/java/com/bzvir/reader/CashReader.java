@@ -150,13 +150,13 @@ public class CashReader implements Reader {
     private List<Transaction> createTransactions(List<Event> events, String id) {
         List<Transaction> list = new ArrayList<>();
         for (Event event : events) {
-            Transaction transaction = createTransaction(id, event);
+            Transaction transaction = createTransaction(event, id);
             list.add(transaction);
         }
         return list;
     }
 
-    private Transaction createTransaction(String id, Event event) {
+    private Transaction createTransaction(Event event, String id) {
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID().toString());
         transaction.setToAccountId(id);
@@ -182,7 +182,7 @@ public class CashReader implements Reader {
 
 //    static class AccountDirection {
 //    private final int INCOME = 1;
-    private final int EXPENSE = 2;
+    static final int EXPENSE = 2;
 //    private final int IN_WALLET = 3;
 //    }
 
@@ -208,5 +208,15 @@ public class CashReader implements Reader {
 
     public Account findAccountByCategory(String category) {
         return findAccountByCategory(category, this.account);
+    }
+
+    public Account createAccount(Event event) {
+        Account account = new Account();
+        account.setId(UUID.randomUUID().toString());
+        account.setName(event.getCategory());
+        account.setAccountDirection(EXPENSE);
+        account.setCurrencyId("default");
+        account.setDescription("");
+        return account;
     }
 }
