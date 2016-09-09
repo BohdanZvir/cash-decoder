@@ -120,7 +120,7 @@ public class CashReader implements Reader {
         return account.getItems() != null && !account.getItems().isEmpty();
     }
 
-    public List<Event> findTransactions(Account item) {
+    private List<Event> findTransactions(Account item) {
         String id = item.getId();
         return getTransactions().stream()
                 .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
@@ -166,7 +166,7 @@ public class CashReader implements Reader {
         return transaction;
     }
 
-    public void saveTransactions(List<Transaction> list) {
+    private void saveTransactions(List<Transaction> list) {
         if (list != null && !list.isEmpty()) {
             getTransactions().addAll(list);
         }
@@ -193,8 +193,18 @@ public class CashReader implements Reader {
         Account account = findAccountByCategory(category);
         if (account == null) {
             account = createAccount(category);
+            saveNewAccount(account);
         }
         return account;
+    }
+
+    private void saveNewAccount(Account account) {
+        Account expense = getExpenseAccount();
+        List<Account> items = expense.getItems();
+        if (items == null) {
+            items = new ArrayList<>();
+        }
+        items.add(account);
     }
 
     public Account findAccountByCategory(String category) {

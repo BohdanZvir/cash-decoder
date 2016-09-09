@@ -160,6 +160,15 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
+    public void savedAccountWithNonExistingCategory() {
+        String category = "1515151515";
+
+        Account account = reader.getAccount(category);
+        Account actual = reader.findAccountByCategory(category);
+        assertThat(actual, is(account));
+    }
+
+    @Test
     @Ignore
     public void convertP24EventToCash() {
         String description = "parent";
