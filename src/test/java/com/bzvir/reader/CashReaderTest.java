@@ -139,6 +139,18 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void createTransactionWhenConvertingFromEventToCash() {
+        Event event = createPrivat24Event("cat1", "desc");
+
+        int sizeBefore = reader.getTransactions().size();
+        Account account = reader.createAccount(event);
+        List<Transaction> transactions = reader.getTransactions();
+
+        assertThat(transactions.size(), greaterThan(sizeBefore));
+        assertThat(account, not(nullValue()));
+    }
+
+    @Test
+    public void validateTransactionWhenConvertingFromEventToCash() {
         double amount = 10.0;
         String date = "2015-10-22";
         String time = "11:54";
@@ -151,12 +163,8 @@ public class CashReaderTest extends AbstractTest {
         event.setProperty("Сума у валюті картки", amount);
         event.setProperty("Опис операції", description);
 
-        int sizeBefore = reader.getTransactions().size();
-
         Account account = reader.createAccount(event);
         List<Transaction> transactions = reader.getTransactions();
-
-        assertThat(transactions.size(), greaterThan(sizeBefore));
 
         Transaction transaction = transactions.get(transactions.size() - 1);
 
