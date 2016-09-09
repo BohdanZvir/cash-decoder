@@ -110,9 +110,8 @@ public class CashReaderTest extends AbstractTest {
     @Test
     public void createAccountFromEventWithStubbedData() {
         String category = "cat0";
-        Event event = createPrivat24Event(category, "");
 
-        Account account = reader.createAccount(event);
+        Account account = reader.getAccount(category);
 
         assertThat(account.getAccountDirection(), is(CashReader.EXPENSE));
         assertThat(account.getCurrencyId(), is("default"));
@@ -132,7 +131,7 @@ public class CashReaderTest extends AbstractTest {
         doReturn(spy.findAccountByCategory(category,parent)).when(spy).findAccountByCategory(category);
 
         Event event = createPrivat24Event(category, "");
-        Account actual = spy.createAccount(event);
+        Account actual = spy.getAccount(event.getCategory());
 
         assertThat(actual, is(expected));
     }
@@ -142,7 +141,10 @@ public class CashReaderTest extends AbstractTest {
         Event event = createPrivat24Event("cat1", "desc");
 
         int sizeBefore = reader.getTransactions().size();
-        Account account = reader.createAccount(event);
+
+        Account account = reader.getAccount(event.getCategory());
+        reader.saveTransaction(account.getId(), event);
+
         List<Transaction> transactions = reader.getTransactions();
 
         assertThat(transactions.size(), greaterThan(sizeBefore));
@@ -163,7 +165,8 @@ public class CashReaderTest extends AbstractTest {
         event.setProperty("Сума у валюті картки", amount);
         event.setProperty("Опис операції", description);
 
-        Account account = reader.createAccount(event);
+        Account account = reader.getAccount(event.getCategory());
+        reader.saveTransaction(account.getId(), event);
         List<Transaction> transactions = reader.getTransactions();
 
         Transaction transaction = transactions.get(transactions.size() - 1);
@@ -179,18 +182,18 @@ public class CashReaderTest extends AbstractTest {
     @Test
     @Ignore
     public void convertP24EventToCash() {
-        String parentDesc = "parent";
-        String parentCateg = "cat0";
-        Event parent = createPrivat24Event(parentCateg, parentDesc);
+        String description = "parent";
+        String category = "cat0";
+        Event parent = createPrivat24Event(category, description);
         List<Event> p24 = Arrays.asList(parent);
         Account account = reader.reverseConvert(p24);
 
         assertThat(account.getAccountDirection(), is(2));
         assertThat(account.getColor(), is(-8119082));
         assertThat(account.getCurrencyId(), is("default"));
-        assertThat(account.getDescription(), is(parentDesc));
+        assertThat(account.getDescription(), is(description));
         /*assertThat(account.getId(), is("Id"));*/  //"6ca510bd-28ca-45a1-93ab-e45797d2832e"
-        assertThat(account.getName(), is(parentCateg)); //"@string/leisure_activities"
+        assertThat(account.getName(), is(category)); //"@string/leisure_activities"
     }
 
     @Test

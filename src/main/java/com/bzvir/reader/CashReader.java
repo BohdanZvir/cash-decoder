@@ -135,7 +135,9 @@ public class CashReader implements Reader {
     @Override
     public Account reverseConvert(List<Event> p24) {
         List<Transaction> transactions = null;
+
         Map<String, List<Event>> grouped = EventJoiner.groupByCategory(p24);
+
         for (Map.Entry<String, List<Event>> entry : grouped.entrySet()) {
             Account created = createAccount(entry.getKey());
 
@@ -212,21 +214,15 @@ public class CashReader implements Reader {
         return findAccountByCategory(category, this.account);
     }
 
-    public Account createAccount(Event event) {
-        Account account = findAccountByCategory(event.getCategory());
+    public Account getAccount(String category) {
+        Account account = findAccountByCategory(category);
         if (account == null) {
-            account = new Account();
-            account.setId(UUID.randomUUID().toString());
-            account.setName(event.getCategory());
-            account.setAccountDirection(EXPENSE);
-            account.setCurrencyId("default");
-            account.setDescription("");
+            account = createAccount(category);
         }
-        saveTransaction(account.getId(), event);
         return account;
     }
 
-    private void saveTransaction(String accountId, Event event) {
+    public void saveTransaction(String accountId, Event event) {
         Transaction trans = createTransaction(accountId, event);
         getTransactions().add(trans);
     }
