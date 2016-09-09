@@ -120,43 +120,27 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
-    public void createAccountFromEventWithExistingCategory() {
+    public void findExistingAccountByCategory() {
         String category = "medicine";
-
         Account expected = createAccount("id", category);
-        Account parent = createAccount("ddd", "");
+        Account parent = createAccount("ddd", "some cat");
         parent.setItems(toList(expected));
 
         CashReader spy = spy(reader);
-        doReturn(spy.findAccountByCategory(category,parent)).when(spy).findAccountByCategory(category);
+        doReturn(spy.findAccountByCategory(category, parent)).when(spy).findAccountByCategory(category);
 
-        Event event = createPrivat24Event(category, "");
-        Account actual = spy.getAccount(event.getCategory());
+        Account actual = spy.getAccount(category);
 
         assertThat(actual, is(expected));
     }
 
     @Test
-    public void createTransactionWhenConvertingFromEventToCash() {
-        Event event = createPrivat24Event("cat1", "desc");
-
-        int sizeBefore = reader.getTransactions().size();
-
-        Account account = reader.getAccount(event.getCategory());
-        reader.saveTransaction(account.getId(), event);
-
-        List<Transaction> transactions = reader.getTransactions();
-
-        assertThat(transactions.size(), greaterThan(sizeBefore));
-        assertThat(account, not(nullValue()));
-    }
-
-    @Test
-    public void validateTransactionWhenConvertingFromEventToCash() {
+    public void validateCreatedTransaction() {
         double amount = 10.0;
         String date = "2015-10-22";
         String time = "11:54";
         String description = "event desc";
+        String accountId = "accountId";
 
         Event event = new Event();
         event.setCategory("cat");
@@ -165,17 +149,13 @@ public class CashReaderTest extends AbstractTest {
         event.setProperty("Сума у валюті картки", amount);
         event.setProperty("Опис операції", description);
 
-        Account account = reader.getAccount(event.getCategory());
-        reader.saveTransaction(account.getId(), event);
-        List<Transaction> transactions = reader.getTransactions();
-
-        Transaction transaction = transactions.get(transactions.size() - 1);
+        Transaction transaction = reader.createTransaction(event, accountId);
 
         assertThat(transaction.getAmount(), is(amount));
         assertThat(transaction.getExchangeRate(), is(1.0F));
         assertThat(transaction.getDate(), is(date));
         assertThat(transaction.getDescription(), is(time + " " + description));
-        assertThat(transaction.getFromAccountId(), is(account.getId()));
+        assertThat(transaction.getFromAccountId(), is(accountId));
         assertThat(transaction.getToAccountId(), is(CASH_ACCOUNT_ID));
     }
 

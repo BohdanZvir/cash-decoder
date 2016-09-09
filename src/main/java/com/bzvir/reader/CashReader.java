@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public class CashReader implements Reader {
 
-    public static final String CASH_ACCOUNT_ID = "13f0d705-d997-449b-9994-0fbc546f6e1e";
+    static final String CASH_ACCOUNT_ID = "13f0d705-d997-449b-9994-0fbc546f6e1e";
     private static Map<Class, String> files = new HashMap<>();
 
     static {
@@ -134,32 +134,25 @@ public class CashReader implements Reader {
 
     @Override
     public Account reverseConvert(List<Event> p24) {
-        List<Transaction> transactions = null;
-
         Map<String, List<Event>> grouped = EventJoiner.groupByCategory(p24);
 
         for (Map.Entry<String, List<Event>> entry : grouped.entrySet()) {
-            Account created = createAccount(entry.getKey());
-
+            String category = entry.getKey();
+            Account account = getAccount(category);
             List<Event> events = entry.getValue();
-            transactions = createTransactions(events, created.getId());
-        }
-        if (transactions != null) {
-            getTransactions().addAll(transactions);
+            List<Transaction> transactions = createTransactions(events, account.getId());
+            saveTransactions(transactions);
         }
         return account;
     }
 
     private List<Transaction> createTransactions(List<Event> events, String accountId) {
-        List<Transaction> list = new ArrayList<>();
-        for (Event event : events) {
-            Transaction transaction = createTransaction(accountId, event);
-            list.add(transaction);
-        }
-        return list;
+        return events.stream()
+                .map(event -> createTransaction(event, accountId))
+                .collect(Collectors.toList());
     }
 
-    private Transaction createTransaction(String fromAccountId, Event event) {
+    public Transaction createTransaction(Event event, String fromAccountId) {
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID().toString());
         transaction.setToAccountId(CASH_ACCOUNT_ID);
@@ -171,6 +164,12 @@ public class CashReader implements Reader {
         String time = (String) event.getProperty("Час");
         transaction.setDescription(time  + " " + event.getProperty("Опис операції"));
         return transaction;
+    }
+
+    public void saveTransactions(List<Transaction> list) {
+        if (list != null && !list.isEmpty()) {
+            getTransactions().addAll(list);
+        }
     }
 
     private Account createAccount(String category) {
@@ -190,6 +189,18 @@ public class CashReader implements Reader {
 //    private final int IN_WALLET = 3;
 //    }
 
+    public Account getAccount(String category) {
+        Account account = findAccountByCategory(category);
+        if (account == null) {
+            account = createAccount(category);
+        }
+        return account;
+    }
+
+    public Account findAccountByCategory(String category) {
+        return findAccountByCategory(category, this.account);
+    }
+
     public Account findAccountByCategory(String category, Account account) {
         if (!isParent(account)) {
             return null;
@@ -208,22 +219,5 @@ public class CashReader implements Reader {
             }
         }
         return null;
-    }
-
-    public Account findAccountByCategory(String category) {
-        return findAccountByCategory(category, this.account);
-    }
-
-    public Account getAccount(String category) {
-        Account account = findAccountByCategory(category);
-        if (account == null) {
-            account = createAccount(category);
-        }
-        return account;
-    }
-
-    public void saveTransaction(String accountId, Event event) {
-        Transaction trans = createTransaction(accountId, event);
-        getTransactions().add(trans);
     }
 }
