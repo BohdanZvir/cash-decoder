@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
  */
 public class CashReader implements Reader {
 
+    public static final String CASH_ACCOUNT_ID = "13f0d705-d997-449b-9994-0fbc546f6e1e";
     private static Map<Class, String> files = new HashMap<>();
 
     static {
@@ -147,25 +148,26 @@ public class CashReader implements Reader {
         return account;
     }
 
-    private List<Transaction> createTransactions(List<Event> events, String id) {
+    private List<Transaction> createTransactions(List<Event> events, String accountId) {
         List<Transaction> list = new ArrayList<>();
         for (Event event : events) {
-            Transaction transaction = createTransaction(event, id);
+            Transaction transaction = createTransaction(accountId, event);
             list.add(transaction);
         }
         return list;
     }
 
-    private Transaction createTransaction(Event event, String id) {
+    private Transaction createTransaction(String fromAccountId, Event event) {
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID().toString());
-        transaction.setToAccountId(id);
+        transaction.setToAccountId(CASH_ACCOUNT_ID);
+
         transaction.setAmount((Double) event.getProperty("Сума у валюті картки"));
         transaction.setExchangeRate(1.0F);
         transaction.setDate((String) event.getProperty("Дата"));
-        transaction.setFromAccountId("6ca510bd-28ca-45a1-93ab-e45797d2832e");
+        transaction.setFromAccountId(fromAccountId);
         String time = (String) event.getProperty("Час");
-        transaction.setDescription(event.getProperty("Опис операції") + " " + time);
+        transaction.setDescription(time  + " " + event.getProperty("Опис операції"));
         return transaction;
     }
 
@@ -220,6 +222,12 @@ public class CashReader implements Reader {
             account.setCurrencyId("default");
             account.setDescription("");
         }
+        saveTransaction(account.getId(), event);
         return account;
+    }
+
+    private void saveTransaction(String accountId, Event event) {
+        Transaction trans = createTransaction(accountId, event);
+        getTransactions().add(trans);
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static com.bzvir.reader.CashReader.CASH_ACCOUNT_ID;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -134,6 +135,37 @@ public class CashReaderTest extends AbstractTest {
         Account actual = spy.createAccount(event);
 
         assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void createTransactionWhenConvertingFromEventToCash() {
+        double amount = 10.0;
+        String date = "2015-10-22";
+        String time = "11:54";
+        String description = "event desc";
+
+        Event event = new Event();
+        event.setCategory("cat");
+        event.setProperty("Дата", date);
+        event.setProperty("Час", time);
+        event.setProperty("Сума у валюті картки", amount);
+        event.setProperty("Опис операції", description);
+
+        int sizeBefore = reader.getTransactions().size();
+
+        Account account = reader.createAccount(event);
+        List<Transaction> transactions = reader.getTransactions();
+
+        assertThat(transactions.size(), greaterThan(sizeBefore));
+
+        Transaction transaction = transactions.get(transactions.size() - 1);
+
+        assertThat(transaction.getAmount(), is(amount));
+        assertThat(transaction.getExchangeRate(), is(1.0F));
+        assertThat(transaction.getDate(), is(date));
+        assertThat(transaction.getDescription(), is(time + " " + description));
+        assertThat(transaction.getFromAccountId(), is(account.getId()));
+        assertThat(transaction.getToAccountId(), is(CASH_ACCOUNT_ID));
     }
 
     @Test
