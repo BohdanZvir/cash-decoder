@@ -7,6 +7,8 @@ import com.bzvir.reader.CashReader;
 import com.bzvir.report.ShortReporter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by bohdan.
@@ -99,5 +101,9 @@ public class AbstractTest {
         Event cash = createEvent(category, "", "", "cash " + description);
         cash.setProperty("accountId", "6ca510bd-28ca-45a1-93ab-e45797d2832e");
         return cash;
+    }
+
+    protected <T> List<T> toList(T... objects){
+        return Arrays.<T>asList(objects);
     }
 }

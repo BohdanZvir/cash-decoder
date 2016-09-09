@@ -80,7 +80,7 @@ public class CashReaderTest extends AbstractTest {
         Account child2 = createAccount(childId_2, "cat child 2");
 
         Account parent = createAccount(parentId, "cat parent");
-        parent.setItems(Arrays.asList(child1, child2));
+        parent.setItems(toList(child1, child2));
 
         Transaction trans1 = createTransaction(childId_1, "1 child 1");
         Transaction trans2 = createTransaction(childId_1, "2 child 1");
@@ -88,7 +88,7 @@ public class CashReaderTest extends AbstractTest {
         Transaction trans4 = createTransaction(childId_2, "4 child 2");
 
         CashReader spyReader = spy(reader);
-        doReturn(Arrays.asList(trans1, trans2, trans3, trans4))
+        doReturn(toList(trans1, trans2, trans3, trans4))
                 .when(spyReader).getTransactions();
 
         List<Account> accounts = Collections.singletonList(parent);
@@ -125,7 +125,7 @@ public class CashReaderTest extends AbstractTest {
 
         Account expected = createAccount("id", category);
         Account parent = createAccount("ddd", "");
-        parent.setItems(Arrays.asList(expected));
+        parent.setItems(toList(expected));
 
         CashReader spy = spy(reader);
         doReturn(spy.findAccountByCategory(category,parent)).when(spy).findAccountByCategory(category);
@@ -185,7 +185,7 @@ public class CashReaderTest extends AbstractTest {
         String description = "parent";
         String category = "cat0";
         Event parent = createPrivat24Event(category, description);
-        List<Event> p24 = Arrays.asList(parent);
+        List<Event> p24 = toList(parent);
         Account account = reader.reverseConvert(p24);
 
         assertThat(account.getAccountDirection(), is(2));
@@ -202,7 +202,7 @@ public class CashReaderTest extends AbstractTest {
         Event parent = createPrivat24Event("cat0", "parent");
         Event child1 = createPrivat24Event("cat1", "child1");
         Event child2 = createPrivat24Event("cat2", "child2");
-        List<Event> p24 = Arrays.asList(parent, child1, child2);
+        List<Event> p24 = toList(parent, child1, child2);
 
         CashReader reader = new CashReader(SAMPLE_DIR);
         Account account = reader.reverseConvert(p24);
