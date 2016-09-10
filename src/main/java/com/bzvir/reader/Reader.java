@@ -1,6 +1,5 @@
 package com.bzvir.reader;
 
-import com.burtyka.cash.core.Account;
 import com.bzvir.model.Event;
 
 import java.util.List;
@@ -14,5 +13,5 @@ public interface Reader {
     Set<String> getTitles();
     boolean checkTitlesOnPresence();
     List<Event> loadData();
-    Account reverseConvert(List<Event> p24);
+    void reverseConvert(List<Event> p24);
 }

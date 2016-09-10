@@ -161,20 +161,23 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
-    @Ignore
     public void validateCreatedAccountFromEvent() {
-        String description = "parent";
+        String description = "event";
         String category = "cat0";
-        Event parent = createPrivat24Event(category, description);
+        Event event = createPrivat24Event(category, description);
 
-        List<Event> p24 = toList(parent);
-        Account account = reader.reverseConvert(p24);
+        String accountId = "accountId";
+        Account account = createAccount(accountId, category);
 
-        assertThat(account.getAccountDirection(), is(2));
-        assertThat(account.getColor(), is(-8119082));
-        assertThat(account.getCurrencyId(), is("default"));
-        assertThat(account.getDescription(), is(description));
-        assertThat(account.getName(), is(category));
+        CashReader spy = spy(reader);
+        doReturn(account).when(spy).createAccount(category);
+
+        List<Event> p24 = toList(event);
+        spy.reverseConvert(p24);
+
+        verify(spy).createAccount(category);
+        verify(spy).getTransactions();
+        verify(spy).createTransaction(event, accountId);
     }
 
 }

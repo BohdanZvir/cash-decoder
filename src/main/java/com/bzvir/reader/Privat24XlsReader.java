@@ -1,6 +1,5 @@
 package com.bzvir.reader;
 
-import com.burtyka.cash.core.Account;
 import com.bzvir.model.Event;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -80,8 +79,7 @@ public class Privat24XlsReader implements Reader {
     }
 
     @Override
-    public Account reverseConvert(List<Event> p24) {
-        return new Account();
+    public void reverseConvert(List<Event> p24) {
     }
 
     public Event constructEvent(Row row) {

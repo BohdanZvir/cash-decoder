@@ -133,7 +133,7 @@ public class CashReader implements Reader {
     }
 
     @Override
-    public Account reverseConvert(List<Event> p24) {
+    public void reverseConvert(List<Event> p24) {
         Map<String, List<Event>> grouped = EventJoiner.groupByCategory(p24);
 
         for (Map.Entry<String, List<Event>> entry : grouped.entrySet()) {
@@ -143,7 +143,6 @@ public class CashReader implements Reader {
             List<Transaction> transactions = createTransactions(events, account.getId());
             saveTransactions(transactions);
         }
-        return account;
     }
 
     private List<Transaction> createTransactions(List<Event> events, String accountId) {
@@ -172,7 +171,7 @@ public class CashReader implements Reader {
         }
     }
 
-    private Account createAccount(String category) {
+    Account createAccount(String category) {
         Account account = new Account();
         account.setId(UUID.randomUUID().toString());
         account.setName(category);
