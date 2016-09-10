@@ -36,10 +36,11 @@ public class CashReaderTest extends AbstractTest {
         Event event = reader.constructEvent(account, transaction);
 
         assertThat(event.getProperty("accountId"), is(account.getId()));
+        assertThat(event.getProperty("Сума у валюті картки"), is(transaction.getAmount()));
     }
 
     @Test
-    public void loadDataIntoEventList() {
+    public void sizeLoadedEventsFromCashGreater100() {
         reader = new CashReader(SAMPLE_DIR);
         List<Event> events = reader.loadData();
 
@@ -48,14 +49,14 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
-    public void checkIsParentOnSimpleAccount() {
+    public void simpleAccountIsNotParent() {
         boolean parent = CashReader.isParent(new Account());
 
         assertFalse(parent);
     }
 
     @Test
-    public void checkIsParentOnAccountWithTwoChilds() {
+    public void accountWithTwoChildItemsIsParent() {
         Account child_1 = new Account();
         Account child_2 = new Account();
         Account parent = new Account();
@@ -70,7 +71,7 @@ public class CashReaderTest extends AbstractTest {
     // first child account has three transactions,
     // second child account has one transaction.
     @Test
-    public void aggregateEventsFromParentAccount() {
+    public void created4EventsFromParentAccontTwoChildsAndTransactions() {
 
         String childId_1 = "child_1";
         String childId_2 = "child_2";
@@ -99,16 +100,7 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
-    public void findAccountByEventCategory() {
-        String category = "medicine";
-
-        Account account = reader.findAccountByCategory(category);
-
-        assertThat(account.getName(), containsString(category));
-    }
-
-    @Test
-    public void createAccountFromEventWithStubbedData() {
+    public void createAccountForNonExistingCategory() {
         String category = "cat0";
 
         Account account = reader.getAccount(category);
@@ -135,7 +127,7 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
-    public void validateCreatedTransaction() {
+    public void validateCreatedTransactionFromEvent() {
         double amount = 10.0;
         String date = "2015-10-22";
         String time = "11:54";
@@ -170,10 +162,11 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     @Ignore
-    public void convertP24EventToCash() {
+    public void validateCreatedAccountFromEvent() {
         String description = "parent";
         String category = "cat0";
         Event parent = createPrivat24Event(category, description);
+
         List<Event> p24 = toList(parent);
         Account account = reader.reverseConvert(p24);
 
@@ -181,22 +174,7 @@ public class CashReaderTest extends AbstractTest {
         assertThat(account.getColor(), is(-8119082));
         assertThat(account.getCurrencyId(), is("default"));
         assertThat(account.getDescription(), is(description));
-        /*assertThat(account.getId(), is("Id"));*/  //"6ca510bd-28ca-45a1-93ab-e45797d2832e"
-        assertThat(account.getName(), is(category)); //"@string/leisure_activities"
-    }
-
-    @Test
-    @Ignore
-    public void convertThreeP24EventsToCash() {
-        Event parent = createPrivat24Event("cat0", "parent");
-        Event child1 = createPrivat24Event("cat1", "child1");
-        Event child2 = createPrivat24Event("cat2", "child2");
-        List<Event> p24 = toList(parent, child1, child2);
-
-        CashReader reader = new CashReader(SAMPLE_DIR);
-        Account account = reader.reverseConvert(p24);
-
-        assertThat(account.getItems(), hasSize(2));
+        assertThat(account.getName(), is(category));
     }
 
 }
