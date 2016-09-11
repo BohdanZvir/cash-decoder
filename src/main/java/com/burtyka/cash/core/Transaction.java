@@ -1,5 +1,6 @@
 package com.burtyka.cash.core;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,6 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class Transaction implements Serializable {
 
 	private static final long serialVersionUID = -7055283267130801235L;

@@ -73,7 +73,10 @@ public class ClassGenerator {
                 StringBuilder sb = new StringBuilder();
                 sb
                         .append("package ").append(packageName).append(";\n\n")
-                        .append("@lombok.Getter\n@lombok.Setter\n@lombok.ToString\n")
+                        .append("@lombok.Getter\n" +
+                                "@lombok.Setter\n" +
+                                "@lombok.ToString\n" +
+                                "@lombok.EqualsAndHashCode\n")
                         .append("public ").append(str.replaceFirst(packageName + ".", "")).append("\n");
                 list.add(sb.toString());
                 collect.put(file, list);
