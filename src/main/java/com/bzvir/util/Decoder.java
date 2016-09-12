@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 public class Decoder {
 
@@ -84,5 +83,10 @@ public class Decoder {
 
     public List<Event> readCash() {
         return cashReader.loadData();
+    }
+
+    public void saveToCash(List<Event> events) {
+        cashReader.reverseConvert(events);
+        cashReader.saveToFileSystem();
     }
 }

@@ -14,4 +14,5 @@ public interface Reader {
     boolean checkTitlesOnPresence();
     List<Event> loadData();
     void reverseConvert(List<Event> p24);
+    void saveToFileSystem();
 }

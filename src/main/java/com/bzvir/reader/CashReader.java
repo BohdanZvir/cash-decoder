@@ -4,9 +4,7 @@ import com.burtyka.cash.core.*;
 import com.bzvir.model.Event;
 import com.bzvir.util.EventJoiner;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,15 +38,38 @@ public class CashReader implements Reader {
     }
 
     public <T> T getValue(Class<T> clazz) {
-        String filename = files.get(clazz);
-        String filePath = dirPath + filename;
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filePath)));
+        String filePath = getFilePath(clazz);
+        try (FileInputStream in = new FileInputStream(filePath);
+             ObjectInputStream ois = new ObjectInputStream(in)) {
+
             return clazz.cast(ois.readObject());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void saveToFileSystem() {
+        writeToFile(this.account);
+        writeToFile(this.transactionManager);
+    }
+
+    public <T> void writeToFile(T root) {
+        String filePath = getFilePath(root.getClass());
+
+        try (FileOutputStream file = new FileOutputStream(filePath);
+             ObjectOutputStream output = new ObjectOutputStream(file)) {
+
+            output.writeObject(root);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getFilePath(Class clazz) {
+        String filename = files.get(clazz);
+        return dirPath + filename;
     }
 
     @Override
@@ -71,13 +92,17 @@ public class CashReader implements Reader {
     public List<Event> loadData() {
         Account expense = getExpenseAccount();
 
-        if (expense == null
-                || expense.getItems() == null
-                || expense.getItems().isEmpty()) {
+        if (hasData(expense)) {
             throw new RuntimeException("There are no items to work with.");
         }
         List<Account> items = expense.getItems();
         return aggregateEvents(items);
+    }
+
+    protected boolean hasData(Account expense) {
+        return expense == null
+                || expense.getItems() == null
+                || expense.getItems().isEmpty();
     }
 
     public Event constructEvent(Account account, Transaction transaction) {
@@ -93,13 +118,16 @@ public class CashReader implements Reader {
     }
 
     private Account getExpenseAccount() {
+        if (hasData(this.account)) {
+            throw new RuntimeException("There are no account to wort with.");
+        }
         List<Account> items = account.getItems();
         for (Account item : items) {
             if (item.getName().contains("expenses")) {
                 return item;
             }
         }
-        return null;
+        return new Account();
     }
 
     public List<Event> aggregateEvents(List<Account> items) {
@@ -182,22 +210,19 @@ public class CashReader implements Reader {
         return account;
     }
 
-//    static class AccountDirection {
-//    private final int INCOME = 1;
+//    AccountDirection: INCOME = 1; IN_WALLET = 3;
     static final int EXPENSE = 2;
-//    private final int IN_WALLET = 3;
-//    }
 
     public Account getAccount(String category) {
         Account account = findAccountByCategory(category);
         if (account == null) {
             account = createAccount(category);
-            saveNewAccount(account);
+            updateExpenseAccount(account);
         }
         return account;
     }
 
-    private void saveNewAccount(Account account) {
+    private void updateExpenseAccount(Account account) {
         Account expense = getExpenseAccount();
         List<Account> items = expense.getItems();
         if (items == null) {

@@ -82,6 +82,10 @@ public class Privat24XlsReader implements Reader {
     public void reverseConvert(List<Event> p24) {
     }
 
+    @Override
+    public void saveToFileSystem() {
+    }
+
     public Event constructEvent(Row row) {
         Event event = new Event();
         List<String> p24Titles = readRowTitles();
