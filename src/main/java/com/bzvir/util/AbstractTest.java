@@ -105,6 +105,6 @@ public class AbstractTest {
     }
 
     protected <T> List<T> toList(T... objects){
-        return Arrays.<T>asList(objects);
+        return Arrays.asList(objects);
     }
 }
