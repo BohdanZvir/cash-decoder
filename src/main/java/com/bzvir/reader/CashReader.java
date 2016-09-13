@@ -127,7 +127,7 @@ public class CashReader implements Reader {
                 return item;
             }
         }
-        return new Account();
+        throw new RuntimeException("Can't find Expenses account.");
     }
 
     public List<Event> aggregateEvents(List<Account> items) {

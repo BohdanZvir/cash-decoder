@@ -182,13 +182,12 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void accountSavedToFileSystem() {
-        String category = "32323223";
         String stubAccount = SAMPLE_DIR + "account2.dat";
 
         File expectSaveTo = new File(stubAccount);
-        assertFalse(stubAccount + " shouldn't exsist", expectSaveTo.exists());
+        assertFalse(stubAccount + " shouldn't exist", expectSaveTo.exists());
 
-        Account cat = dummyAccount("id", category);
+        Account cat = dummyAccount("id", "32323223");
 
         CashReader spy = spy(reader);
         doReturn(stubAccount).when(spy).getFilePath(Account.class);
@@ -200,4 +199,22 @@ public class CashReaderTest extends AbstractTest {
         assertTrue(expectSaveTo.exists());
         assertTrue(stubAccount + " should be deleted", expectSaveTo.delete());
     }
+
+    @Test
+    public void accountWithNewCategorySavedToExpensesAccount() {
+        String category = "32323223";
+
+        Account preCheck = reader.findAccountByCategory(category);
+        assertThat(preCheck, nullValue());
+
+        reader.getAccount(category);
+        Account expense = reader.findAccountByCategory("expenses");
+
+        boolean actual = false;
+        for (Account account : expense.getItems()) {
+            actual |= account.getName().contains(category);
+        }
+        assertTrue(actual);
+    }
+
 }
