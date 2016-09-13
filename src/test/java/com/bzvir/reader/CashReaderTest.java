@@ -77,16 +77,16 @@ public class CashReaderTest extends AbstractTest {
         String childId_2 = "child_2";
         String parentId = "parent";
 
-        Account child1 = createAccount(childId_1, "cat child 1");
-        Account child2 = createAccount(childId_2, "cat child 2");
+        Account child1 = dummyAccount(childId_1, "cat child 1");
+        Account child2 = dummyAccount(childId_2, "cat child 2");
 
-        Account parent = createAccount(parentId, "cat parent");
+        Account parent = dummyAccount(parentId, "cat parent");
         parent.setItems(toList(child1, child2));
 
-        Transaction trans1 = createTransaction(childId_1, "1 child 1");
-        Transaction trans2 = createTransaction(childId_1, "2 child 1");
-        Transaction trans3 = createTransaction(childId_1, "3 child 1");
-        Transaction trans4 = createTransaction(childId_2, "4 child 2");
+        Transaction trans1 = dummyTransaction(childId_1, "1 child 1");
+        Transaction trans2 = dummyTransaction(childId_1, "2 child 1");
+        Transaction trans3 = dummyTransaction(childId_1, "3 child 1");
+        Transaction trans4 = dummyTransaction(childId_2, "4 child 2");
 
         CashReader spyReader = spy(reader);
         doReturn(toList(trans1, trans2, trans3, trans4))
@@ -114,8 +114,8 @@ public class CashReaderTest extends AbstractTest {
     @Test
     public void findExistingAccountByCategory() {
         String category = "medicine";
-        Account expected = createAccount("id", category);
-        Account parent = createAccount("ddd", "some cat");
+        Account expected = dummyAccount("id", category);
+        Account parent = dummyAccount("ddd", "some cat");
         parent.setItems(toList(expected));
 
         CashReader spy = spy(reader);
@@ -164,10 +164,10 @@ public class CashReaderTest extends AbstractTest {
     public void validateCreatedAccountFromEvent() {
         String description = "event";
         String category = "cat0";
-        Event event = createPrivat24Event(category, description);
+        Event event = dummyPrivat24Event(category, description);
 
         String accountId = "accountId";
-        Account account = createAccount(accountId, category);
+        Account account = dummyAccount(accountId, category);
 
         CashReader spy = spy(reader);
         doReturn(account).when(spy).createAccount(category);
@@ -188,7 +188,7 @@ public class CashReaderTest extends AbstractTest {
         File expectSaveTo = new File(stubAccount);
         assertFalse(stubAccount + " shouldn't exsist", expectSaveTo.exists());
 
-        Account cat = createAccount("id", category);
+        Account cat = dummyAccount("id", category);
 
         CashReader spy = spy(reader);
         doReturn(stubAccount).when(spy).getFilePath(Account.class);

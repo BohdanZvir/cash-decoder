@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+`import static com.bzvir.util.EventJoiner.groupByCategory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -26,10 +27,10 @@ public class EventsJoinerTest extends AbstractTest {
 
     @Test
     public void joinOneCashAndOnePrivat24Event() {
-        Event cash = createCashEvent("@string/leisure_activities", "");
-        Event privat24 = createPrivat24Event("Перекази", "privat24");
+        Event cash = dummyCashEvent("@string/leisure_activities", "");
+        Event privat24 = dummyPrivat24Event("Перекази", "privat24");
 
-        List<Event> list = eventJoiner.join(Arrays.asList(cash), Arrays.asList(privat24));
+        List<Event> list = eventJoiner.join(toList(cash), toList(privat24));
 
         assertThat(list, hasItem(cash));
         assertThat(list, hasItem(privat24));
@@ -37,11 +38,11 @@ public class EventsJoinerTest extends AbstractTest {
 
     @Test
     public void joinTwoEventsWithChangingCategory() {
-        Event cash = createCashEvent("@string/leisure_activities", "cash");
-        Event privat24 = createPrivat24Event("Перекази", "");
+        Event cash = dummyCashEvent("@string/leisure_activities", "cash");
+        Event privat24 = dummyPrivat24Event("Перекази", "");
 
-        List<Event> list = eventJoiner.join(Arrays.asList(cash), Arrays.asList(privat24));
-        Event newPrivat24 = createPrivat24Event("transfers", "");
+        List<Event> list = eventJoiner.join(toList(cash), toList(privat24));
+        Event newPrivat24 = dummyPrivat24Event("transfers", "");
 
         assertThat(list, hasItem(cash));
         assertThat(list, hasItem(newPrivat24));
@@ -49,13 +50,13 @@ public class EventsJoinerTest extends AbstractTest {
 
     @Test
     public void joinEventsWithTwoTimesChangingCategoory() {
-        Event cash = createCashEvent("@string/leisure_activities", "cash");
-        Event privat24_1 = createPrivat24Event("Перекази", "1");
-        Event privat24_2 = createPrivat24Event("Оренда", "2");
+        Event cash = dummyCashEvent("@string/leisure_activities", "cash");
+        Event privat24_1 = dummyPrivat24Event("Перекази", "1");
+        Event privat24_2 = dummyPrivat24Event("Оренда", "2");
 
-        List<Event> list = eventJoiner.join(Arrays.asList(cash), Arrays.asList(privat24_1, privat24_2));
-        Event newPrivat24_1 = createPrivat24Event("transfers", "1");
-        Event newPrivat24_2 = createPrivat24Event("rent", "2");
+        List<Event> list = eventJoiner.join(toList(cash), toList(privat24_1, privat24_2));
+        Event newPrivat24_1 = dummyPrivat24Event("transfers", "1");
+        Event newPrivat24_2 = dummyPrivat24Event("rent", "2");
 
         assertThat(list, hasItem(cash));
         assertThat(list, hasItem(newPrivat24_1));
@@ -66,11 +67,11 @@ public class EventsJoinerTest extends AbstractTest {
     public void groupingEventsByCategoriesWithTwoDistinct() {
         String category1 = "cat_1";
         String category2 = "cat_2";
-        Event p1_1 = createPrivat24Event(category1, "1");
-        Event p1_2 = createPrivat24Event(category1, "2");
-        Event p2_1 = createPrivat24Event(category2, "1");
+        Event p1_1 = dummyPrivat24Event(category1, "1");
+        Event p1_2 = dummyPrivat24Event(category1, "2");
+        Event p2_1 = dummyPrivat24Event(category2, "1");
 
-        Map<String, List<Event>> result = eventJoiner.groupByCategory(Arrays.asList(p1_1, p1_2, p2_1));
+        Map<String, List<Event>> result = groupByCategory(Arrays.asList(p1_1, p1_2, p2_1));
 
         assertThat(result.keySet(), hasItem(category1));
         assertThat(result.keySet(), hasItem(category2));
@@ -84,10 +85,10 @@ public class EventsJoinerTest extends AbstractTest {
     @Test
     public void groupingTwoEventsByCategoriesWithOneDistinct() {
         String category = "cat";
-        Event p1_1 = createPrivat24Event(category, "1");
-        Event p1_2 = createPrivat24Event(category, "2");
+        Event p1_1 = dummyPrivat24Event(category, "1");
+        Event p1_2 = dummyPrivat24Event(category, "2");
 
-        Map<String, List<Event>> result = eventJoiner.groupByCategory(Arrays.asList(p1_1, p1_2));
+        Map<String, List<Event>> result = groupByCategory(Arrays.asList(p1_1, p1_2));
 
         assertThat(result.keySet(), hasItem(category));
         assertThat(result.keySet(), hasSize(1));

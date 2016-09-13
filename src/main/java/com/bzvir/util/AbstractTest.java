@@ -61,7 +61,7 @@ public class AbstractTest {
     }
 
     //create account with empty list of items and empty description
-    protected Account createAccount(String id, String category) {
+    protected Account dummyAccount(String id, String category) {
         Account account = new Account();
         account.setDescription("");
         account.setId(id);
@@ -71,7 +71,7 @@ public class AbstractTest {
     }
 
     // create dummy transaction with stubbed id, amount, date, accountToId
-    protected Transaction createTransaction(String childId_1, String description) {
+    protected Transaction dummyTransaction(String childId_1, String description) {
         Transaction trans = new Transaction();
         trans.setId("id");
         trans.setAmount(12.0);
@@ -81,8 +81,9 @@ public class AbstractTest {
         trans.setToAccountId("13f0d705-d997-449b-9994-0fbc546f6e1e");
         return trans;
     }
+
     //create dummy Event with stybbed amount, currency
-    protected Event createEvent(String category, String data, String time, String description) {
+    protected Event dummyEvent(String category, String data, String time, String description) {
         Event event = new Event();
         event.setCategory(category);
         event.setProperty("Дата", data);
@@ -93,12 +94,12 @@ public class AbstractTest {
         return event;
     }
 
-    protected Event createPrivat24Event(String category, String description) {
-        return createEvent(category, "", "", "p24" + description);
+    protected Event dummyPrivat24Event(String category, String description) {
+        return dummyEvent(category, "", "", "p24" + description);
     }
 
-    protected Event createCashEvent(String category, String description) {
-        Event cash = createEvent(category, "", "", "cash " + description);
+    protected Event dummyCashEvent(String category, String description) {
+        Event cash = dummyEvent(category, "", "", "cash " + description);
         cash.setProperty("accountId", "6ca510bd-28ca-45a1-93ab-e45797d2832e");
         return cash;
     }
