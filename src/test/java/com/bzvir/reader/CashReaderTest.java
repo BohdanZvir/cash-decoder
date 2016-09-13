@@ -5,9 +5,9 @@ import com.burtyka.cash.core.Transaction;
 import com.bzvir.model.Event;
 import com.bzvir.util.AbstractTest;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.*;
 
 import static com.bzvir.reader.CashReader.CASH_ACCOUNT_ID;
@@ -180,4 +180,24 @@ public class CashReaderTest extends AbstractTest {
         verify(spy).createTransaction(event, accountId);
     }
 
+    @Test
+    public void accountSavedToFileSystem() {
+        String category = "32323223";
+        String stubAccount = SAMPLE_DIR + "account2.dat";
+
+        File expectSaveTo = new File(stubAccount);
+        assertFalse(stubAccount + " shouldn't exsist", expectSaveTo.exists());
+
+        Account cat = createAccount("id", category);
+
+        CashReader spy = spy(reader);
+        doReturn(stubAccount).when(spy).getFilePath(Account.class);
+
+        spy.writeToFile(cat);
+
+        verify(spy).getFilePath(Account.class);
+
+        assertTrue(expectSaveTo.exists());
+        assertTrue(stubAccount + " should be deleted", expectSaveTo.delete());
+    }
 }
