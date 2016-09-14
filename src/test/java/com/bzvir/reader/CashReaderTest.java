@@ -2,6 +2,7 @@ package com.bzvir.reader;
 
 import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
+import com.burtyka.cash.core.TransactionManager;
 import com.bzvir.model.Event;
 import com.bzvir.util.AbstractTest;
 import org.junit.Before;
@@ -112,7 +113,7 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
-    public void findExistingAccountByCategory() {
+    public void accountWithExistingCategoryFound() {
         String category = "medicine";
         Account expected = dummyAccount("id", category);
         Account parent = dummyAccount("ddd", "some cat");
@@ -124,6 +125,7 @@ public class CashReaderTest extends AbstractTest {
         Account actual = spy.getAccount(category);
 
         assertThat(actual, is(expected));
+        verify(spy).isParent(parent);
     }
 
     @Test
@@ -161,7 +163,7 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
-    public void validateCreatedAccountFromEvent() {
+    public void accountAndTransactionCreatedFromEvent() {
         String description = "event";
         String category = "cat0";
         Event event = dummyPrivat24Event(category, description);
@@ -178,10 +180,11 @@ public class CashReaderTest extends AbstractTest {
         verify(spy).createAccount(category);
         verify(spy).getTransactions();
         verify(spy).createTransaction(event, accountId);
+        assertThat(spy.findTransactions(account), notNullValue());
     }
 
     @Test
-    public void accountSavedToFileSystem() {
+    public void dummyAccountSavedToFileSystem() {
         String stubAccount = SAMPLE_DIR + "account2.dat";
 
         File expectSaveTo = new File(stubAccount);
@@ -217,4 +220,26 @@ public class CashReaderTest extends AbstractTest {
         assertTrue(actual);
     }
 
+    @Test
+    public void accountAndTransactionsSavedToFileSystem() {
+        String stubAccount = SAMPLE_DIR + "account2.dat";
+        String stubTransManager = SAMPLE_DIR + "transactionalManager2.dat";
+        CashReader spy = spy(reader);
+
+        doReturn(stubAccount).when(spy).getFilePath(Account.class);
+        doReturn(stubTransManager).when(spy).getFilePath(TransactionManager.class);
+
+        spy.saveToFileSystem();
+
+        verify(spy).getFilePath(Account.class);
+        verify(spy).getFilePath(TransactionManager.class);
+
+        File accountFile = new File(stubAccount);
+        File tmFile = new File(stubTransManager);
+
+        assertTrue(accountFile.exists());
+        assertTrue(stubAccount + " should be deleted", accountFile.delete());
+        assertTrue(tmFile.exists());
+        assertTrue(stubTransManager + " should be deleted", tmFile.delete());
+    }
 }

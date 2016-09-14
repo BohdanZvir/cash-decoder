@@ -40,4 +40,14 @@ public class DecoderTest extends AbstractTest {
         assertThat(events.size(), equalTo(expected));
     }
 
+    @Test
+    public void updateCash() {
+        Decoder decoder = new Decoder();
+        List<Event> p24 = decoder.readP24();
+        List<Event> cash = decoder.readCash();
+        EventJoiner joiner = new EventJoiner();
+        List<Event> events = joiner.join(cash, p24);
+
+        decoder.saveToCash(events);
+    }
 }

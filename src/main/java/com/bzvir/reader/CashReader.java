@@ -54,7 +54,7 @@ public class CashReader implements Reader {
         writeToFile(this.transactionManager);
     }
 
-    public <T> void writeToFile(T root) {
+    protected void writeToFile(Object root) {
         String filePath = getFilePath(root.getClass());
 
         try (FileOutputStream file = new FileOutputStream(filePath);
@@ -99,7 +99,7 @@ public class CashReader implements Reader {
         return aggregateEvents(items);
     }
 
-    protected boolean hasData(Account expense) {
+    private boolean hasData(Account expense) {
         return expense == null
                 || expense.getItems() == null
                 || expense.getItems().isEmpty();
@@ -148,7 +148,7 @@ public class CashReader implements Reader {
         return account.getItems() != null && !account.getItems().isEmpty();
     }
 
-    private List<Event> findTransactions(Account item) {
+    List<Event> findTransactions(Account item) {
         String id = item.getId();
         return getTransactions().stream()
                 .filter(trans -> trans.getFromAccountId().equalsIgnoreCase(id))
