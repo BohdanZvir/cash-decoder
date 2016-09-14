@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 /**
  * Created by bohdan.
  */
-public class EventJoiner {
+public class EventMapper {
 
     private Map<String, String> categoryMap;
 
-    public EventJoiner(){
+    public EventMapper(){
         categoryMap = new HashMap<>();
         loadCategoryMap();
     }
@@ -46,13 +46,7 @@ public class EventJoiner {
         }
     }
 
-    public List<Event> join(List<Event> cash, List<Event> privat24) {
-        List<Event> result = new LinkedList<>(cash);
-        result.addAll(mapCategory(privat24));
-        return result;
-    }
-
-    private Collection<? extends Event> mapCategory(Collection<Event> privat24) {
+    public List<Event> mapToCashCategories(Collection<Event> privat24) {
 
         return privat24.stream().map(event -> {
             String category = event.getCategory();

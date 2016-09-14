@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.bzvir.util.EventJoiner.groupByCategory;
+import static com.bzvir.util.EventMapper.groupByCategory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -16,55 +16,42 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 /**
  * Created by bohdan.
  */
-public class EventsJoinerTest extends AbstractTest {
+public class EventsMapperTest extends AbstractTest {
 
-    private EventJoiner eventJoiner;
+    private EventMapper mapper;
 
     @Before
     public void setUp() {
-        eventJoiner = new EventJoiner();
+        mapper = new EventMapper();
     }
 
     @Test
-    public void joinOneCashAndOnePrivat24Event() {
-        Event cash = dummyCashEvent("@string/leisure_activities", "");
-        Event privat24 = dummyPrivat24Event("Перекази", "privat24");
+    public void categoryChangedForP24Event() {
+        Event p24 = dummyPrivat24Event("Перекази", "");
 
-        List<Event> list = eventJoiner.join(toList(cash), toList(privat24));
+        List<Event> list = mapper.mapToCashCategories(toList(p24));
+        Event cash = dummyPrivat24Event("transfers", "");
 
         assertThat(list, hasItem(cash));
-        assertThat(list, hasItem(privat24));
     }
 
     @Test
-    public void joinTwoEventsWithChangingCategory() {
+    public void categoryChangedForTwoP24EventSkippedForCash() {
         Event cash = dummyCashEvent("@string/leisure_activities", "cash");
-        Event privat24 = dummyPrivat24Event("Перекази", "");
+        Event p24_1 = dummyPrivat24Event("Перекази", "1");
+        Event p24_2 = dummyPrivat24Event("Оренда", "2");
 
-        List<Event> list = eventJoiner.join(toList(cash), toList(privat24));
-        Event newPrivat24 = dummyPrivat24Event("transfers", "");
+        List<Event> list = mapper.mapToCashCategories(toList(p24_1, cash, p24_2));
+        Event cashP24_1 = dummyPrivat24Event("transfers", "1");
+        Event cashP24_2 = dummyPrivat24Event("rent", "2");
 
         assertThat(list, hasItem(cash));
-        assertThat(list, hasItem(newPrivat24));
+        assertThat(list, hasItem(cashP24_1));
+        assertThat(list, hasItem(cashP24_2));
     }
 
     @Test
-    public void joinEventsWithTwoTimesChangingCategoory() {
-        Event cash = dummyCashEvent("@string/leisure_activities", "cash");
-        Event privat24_1 = dummyPrivat24Event("Перекази", "1");
-        Event privat24_2 = dummyPrivat24Event("Оренда", "2");
-
-        List<Event> list = eventJoiner.join(toList(cash), toList(privat24_1, privat24_2));
-        Event newPrivat24_1 = dummyPrivat24Event("transfers", "1");
-        Event newPrivat24_2 = dummyPrivat24Event("rent", "2");
-
-        assertThat(list, hasItem(cash));
-        assertThat(list, hasItem(newPrivat24_1));
-        assertThat(list, hasItem(newPrivat24_2));
-    }
-
-    @Test
-    public void groupingEventsByCategoriesWithTwoDistinct() {
+    public void threeEventsWithTwoDistinctCategoriesGrouped() {
         String category1 = "cat_1";
         String category2 = "cat_2";
         Event p1_1 = dummyPrivat24Event(category1, "1");
@@ -83,7 +70,7 @@ public class EventsJoinerTest extends AbstractTest {
     }
 
     @Test
-    public void groupingTwoEventsByCategoriesWithOneDistinct() {
+    public void twoEventsWithSameCategoryGrouped() {
         String category = "cat";
         Event p1_1 = dummyPrivat24Event(category, "1");
         Event p1_2 = dummyPrivat24Event(category, "2");

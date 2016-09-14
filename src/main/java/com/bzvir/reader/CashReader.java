@@ -2,11 +2,12 @@ package com.bzvir.reader;
 
 import com.burtyka.cash.core.*;
 import com.bzvir.model.Event;
-import com.bzvir.util.EventJoiner;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.bzvir.util.EventMapper.groupByCategory;
 
 /**
  * Created by bohdan.
@@ -162,7 +163,7 @@ public class CashReader implements Reader {
 
     @Override
     public void reverseConvert(List<Event> p24) {
-        Map<String, List<Event>> grouped = EventJoiner.groupByCategory(p24);
+        Map<String, List<Event>> grouped = groupByCategory(p24);
 
         for (Map.Entry<String, List<Event>> entry : grouped.entrySet()) {
             String category = entry.getKey();
