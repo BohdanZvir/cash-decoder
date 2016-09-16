@@ -91,4 +91,9 @@ public class Decoder {
         cashReader.reverseConvert(cashP24);
         cashReader.saveToFileSystem();
     }
+
+    public void updateCash() {
+        List<Event> p24 = readP24();
+        saveToCash(p24);
+    }
 }

@@ -2,7 +2,6 @@ package com.bzvir.util;
 
 import com.bzvir.model.Event;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -34,11 +33,4 @@ public class DecoderTest extends AbstractTest {
         assertThat(cash, not(empty()));
     }
 
-    @Test
-    @Ignore
-    public void updateCash() {
-        List<Event> p24 = decoder.readP24();
-
-        decoder.saveToCash(p24);
-    }
 }
