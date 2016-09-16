@@ -125,7 +125,6 @@ public class CashReaderTest extends AbstractTest {
         Account actual = spy.getAccount(category);
 
         assertThat(actual, is(expected));
-        verify(spy).isParent(parent);
     }
 
     @Test
