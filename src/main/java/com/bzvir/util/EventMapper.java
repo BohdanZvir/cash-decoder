@@ -62,6 +62,9 @@ public class EventMapper {
     }
 
     public void addCategoryToCsv(String newCategory) {
+        if (newCategory == null) {
+            newCategory = "null";
+        }
         ClassLoader classLoader = getClass().getClassLoader();
         URL csvUrl = classLoader.getResource("category_mapping.csv");
         if (csvUrl == null) {
@@ -73,7 +76,7 @@ public class EventMapper {
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw))
         {
-            out.println(newCategory + "," + newCategory);
+            out.printf("%n%s,%s", newCategory, newCategory);
         } catch (IOException e) {
             e.printStackTrace();
         }
