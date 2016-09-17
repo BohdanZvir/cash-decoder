@@ -12,6 +12,7 @@ import static com.bzvir.util.EventMapper.groupByCategory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by bohdan.
@@ -82,5 +83,20 @@ public class EventsMapperTest extends AbstractTest {
         List<Event> events1 = result.get(category);
         assertThat(events1, hasItem(p1_1));
         assertThat(events1, hasItem(p1_2));
+    }
+
+    @Test
+    public void nonExistingCategoryAddedToCsvFile() {
+        String newCategory = "newUnderExpense";
+        Event p24_3 = dummyPrivat24Event(newCategory, "desc3");
+
+        EventMapper spy = spy(mapper);
+        doNothing().when(spy).addCategoryToCsv(newCategory);
+
+        List<Event> p24 = toList(p24_3);
+        List<Event> events = spy.mapToCashCategories(p24);
+
+        assertThat(events, hasItem(p24_3));
+        verify(spy).addCategoryToCsv(newCategory);
     }
 }

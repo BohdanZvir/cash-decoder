@@ -2,9 +2,7 @@ package com.bzvir.util;
 
 import com.bzvir.model.Event;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,12 +44,14 @@ public class EventMapper {
         }
     }
 
-    public List<Event> mapToCashCategories(Collection<Event> privat24) {
+    public List<Event> mapToCashCategories(List<Event> p24) {
 
-        return privat24.stream().map(event -> {
+        return p24.stream().map(event -> {
             String category = event.getCategory();
             if (category != null && categoryMap.containsKey(category)) {
                 event.setCategory(categoryMap.get(category));
+            } else {
+                addCategoryToCsv(category);
             }
             return event;
         }).collect(Collectors.toList());
@@ -59,5 +59,23 @@ public class EventMapper {
 
     public static Map<String, List<Event>> groupByCategory(List<Event> events) {
         return events.stream().collect(Collectors.groupingBy(Event::getCategory));
+    }
+
+    public void addCategoryToCsv(String newCategory) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL csvUrl = classLoader.getResource("category_mapping.csv");
+        if (csvUrl == null) {
+            return;
+        }
+        String csvFile = csvUrl.getFile();
+
+        try(FileWriter fw = new FileWriter(csvFile, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {
+            out.println(newCategory + "," + newCategory);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
