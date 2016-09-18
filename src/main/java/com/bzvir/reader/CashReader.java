@@ -55,7 +55,7 @@ public class CashReader implements Reader {
         writeToFile(this.transactionManager);
     }
 
-    protected void writeToFile(Object root) {
+    void writeToFile(Object root) {
         String filePath = getFilePath(root.getClass());
 
         try (FileOutputStream file = new FileOutputStream(filePath);
@@ -68,7 +68,7 @@ public class CashReader implements Reader {
         }
     }
 
-    public String getFilePath(Class clazz) {
+    String getFilePath(Class clazz) {
         String filename = files.get(clazz);
         return dirPath + filename;
     }
@@ -106,7 +106,7 @@ public class CashReader implements Reader {
                 || expense.getItems().isEmpty();
     }
 
-    public Event constructEvent(Account account, Transaction transaction) {
+    Event constructEvent(Account account, Transaction transaction) {
         Event event = new Event();
         event.setProperty("Категорія", account.getName());
         event.setProperty("Дата", transaction.getDate());
@@ -131,7 +131,7 @@ public class CashReader implements Reader {
         throw new RuntimeException("Can't find Expenses account.");
     }
 
-    public List<Event> aggregateEvents(List<Account> items) {
+    List<Event> aggregateEvents(List<Account> items) {
         List<Event> events = new ArrayList<>();
         List<Event> list;
         for (Account item : items) {
@@ -157,7 +157,7 @@ public class CashReader implements Reader {
                 .collect(Collectors.toList());
     }
 
-    public List<Transaction> getTransactions() {
+    List<Transaction> getTransactions() {
         return transactionManager.getTransasctions();
     }
 
@@ -180,7 +180,7 @@ public class CashReader implements Reader {
                 .collect(Collectors.toList());
     }
 
-    public Transaction createTransaction(Event event, String fromAccountId) {
+    Transaction createTransaction(Event event, String fromAccountId) {
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID().toString());
         transaction.setToAccountId(CASH_ACCOUNT_ID);
@@ -214,7 +214,7 @@ public class CashReader implements Reader {
 //    AccountDirection: INCOME = 1; IN_WALLET = 3;
     static final int EXPENSE = 2;
 
-    public Account getAccount(String category) {
+    Account getAccount(String category) {
         Account account = findAccountByCategory(category);
         if (account == null) {
             account = createAccount(category);
@@ -232,24 +232,22 @@ public class CashReader implements Reader {
         items.add(account);
     }
 
-    public Account findAccountByCategory(String category) {
+    Account findAccountByCategory(String category) {
         return findAccountByCategory(category, this.account);
     }
 
-    public Account findAccountByCategory(String category, Account account) {
-        if (!isParent(account)) {
+    Account findAccountByCategory(String category, Account root) {
+        if (!isParent(root)) {
             return null;
         }
-        List<Account> items = account.getItems();
+        List<Account> items = root.getItems();
         for (Account item : items) {
             if (item.getName().contains(category)) {
                 return item;
             } else {
-                Account account1 = findAccountByCategory(category, item);
-                if (account1 == null){
-                    continue;
-                } else {
-                    return account1;
+                Account account = findAccountByCategory(category, item);
+                if (account != null){
+                    return account;
                 }
             }
         }
