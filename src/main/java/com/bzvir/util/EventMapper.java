@@ -2,7 +2,6 @@ package com.bzvir.util;
 
 import com.bzvir.model.Event;
 
-import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,30 +11,17 @@ import java.util.stream.Collectors;
  */
 public class EventMapper {
 
+    private FileUtil fileUtil;
     private Map<String, String> categoryMap;
 
     public EventMapper(){
-        categoryMap = new HashMap<>();
-        loadCategoryMap();
+        fileUtil = new FileUtil();
+        categoryMap = loadCategoryMap();
     }
 
-    protected void loadCategoryMap() {
+    private Map<String, String> loadCategoryMap() {
         String csvFile = getCsvFilePath();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.isEmpty()
-                        && (line.contains("Cash") || line.contains("Privat24"))) {
-                    continue;
-                }
-                String[] value = line.split(",");
-                categoryMap.put(value[0], value[1]);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return fileUtil.readCategoryCsvFile(csvFile);
     }
 
     public List<Event> mapToCashCategories(List<Event> p24) {
@@ -59,16 +45,9 @@ public class EventMapper {
         if (newCategory == null) {
             newCategory = "null";
         }
-        String csvFile = getCsvFilePath();
-
-        try(FileWriter fw = new FileWriter(csvFile, true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            PrintWriter out = new PrintWriter(bw))
-        {
-            out.printf("%n%s,%s", newCategory, newCategory);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String filePath = getCsvFilePath();
+        String line = "\n" + newCategory+ "," + newCategory;
+        fileUtil.appendLine(line, filePath);
     }
 
     private String getCsvFilePath() {
