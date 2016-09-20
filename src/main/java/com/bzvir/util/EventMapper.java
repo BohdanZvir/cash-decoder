@@ -20,14 +20,10 @@ public class EventMapper {
     }
 
     protected void loadCategoryMap() {
-
         String csvFile = getCsvFilePath();
-        if (csvFile == null) {
-            throw new RuntimeException("Bad path to category_mapping.csv");
-        }
-        String line;
 
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            String line;
             while ((line = br.readLine()) != null) {
                 if (!line.isEmpty()
                         && (line.contains("Cash") || line.contains("Privat24"))) {
@@ -64,9 +60,6 @@ public class EventMapper {
             newCategory = "null";
         }
         String csvFile = getCsvFilePath();
-        if (csvFile == null) {
-            throw new RuntimeException("Bad path to category_mapping.csv");
-        }
 
         try(FileWriter fw = new FileWriter(csvFile, true);
             BufferedWriter bw = new BufferedWriter(fw);
@@ -81,8 +74,8 @@ public class EventMapper {
     private String getCsvFilePath() {
         ClassLoader classLoader = getClass().getClassLoader();
         URL csvUrl = classLoader.getResource("category_mapping.csv");
-        if (csvUrl == null) {
-            return null;
+        if (csvUrl == null || csvUrl.getFile() == null) {
+            throw new RuntimeException("Bad path to category_mapping.csv");
         }
         return csvUrl.getFile();
     }
