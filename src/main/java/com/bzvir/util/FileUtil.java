@@ -1,7 +1,6 @@
 package com.bzvir.util;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
 
 /**
  * Created by bohdan.
@@ -17,5 +16,16 @@ public class FileUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void writeObject(Object obj, String filePath) {
+        try (FileOutputStream file = new FileOutputStream(filePath);
+             ObjectOutputStream output = new ObjectOutputStream(file)) {
+
+            output.writeObject(obj);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 }

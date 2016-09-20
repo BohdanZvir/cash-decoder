@@ -57,15 +57,7 @@ public class CashReader implements Reader {
 
     void writeToFile(Object root) {
         String filePath = getFilePath(root.getClass());
-
-        try (FileOutputStream file = new FileOutputStream(filePath);
-             ObjectOutputStream output = new ObjectOutputStream(file)) {
-
-            output.writeObject(root);
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
+        fileUtil.writeObject(root, filePath);
     }
 
     String getFilePath(Class clazz) {
