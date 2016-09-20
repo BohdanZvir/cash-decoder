@@ -10,8 +10,6 @@ import java.util.Set;
  */
 public interface Reader {
 
-    Set<String> getTitles();
-    boolean checkTitlesOnPresence();
     List<Event> loadData();
     void reverseConvert(List<Event> p24);
     void saveToFileSystem();

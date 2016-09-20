@@ -4,7 +4,6 @@ import com.burtyka.cash.core.*;
 import com.bzvir.model.Event;
 import com.bzvir.util.FileUtil;
 
-import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,22 +62,6 @@ public class CashReader implements Reader {
     String getFilePath(Class clazz) {
         String filename = files.get(clazz);
         return dirPath + filename;
-    }
-
-    @Override
-    public Set<String> getTitles() {
-        return new LinkedHashSet<>(Arrays.asList(
-                "Сума у валюті картки",
-                "Дата",
-                "Час",
-                "Опис операції",
-                "Категорія",
-                "Валюта картки"));
-    }
-
-    @Override
-    public boolean checkTitlesOnPresence() {
-        return true;
     }
 
     @Override

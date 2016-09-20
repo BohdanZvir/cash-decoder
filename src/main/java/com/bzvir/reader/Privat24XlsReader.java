@@ -33,8 +33,7 @@ public class Privat24XlsReader implements Reader {
         return (wb != null) ? wb.getSheetAt(0) : null;
     }
 
-    @Override
-    public Set<String> getTitles() {
+    Set<String> getTitles() {
         return new LinkedHashSet<>(Arrays.asList(
                 "Категорія",
                 "Дата",
@@ -57,14 +56,12 @@ public class Privat24XlsReader implements Reader {
         return list;
     }
 
-    @Override
-    public boolean checkTitlesOnPresence() {
+    boolean checkTitlesOnPresence() {
         Set<String> expected = getTitles();
         List<String> actual = readRowTitles();
         return actual.containsAll(expected);
     }
 
-    @Override
     public List<Event> loadData()  {
         List<String> rawTitles = readRowTitles();
         if (!rawTitles.containsAll(getTitles())) {
