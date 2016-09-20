@@ -2,6 +2,7 @@ package com.bzvir.reader;
 
 import com.burtyka.cash.core.*;
 import com.bzvir.model.Event;
+import com.bzvir.util.FileUtil;
 
 import java.io.*;
 import java.util.*;
@@ -27,9 +28,11 @@ public class CashReader implements Reader {
     private String dirPath;
     private Account account;
     private TransactionManager transactionManager;
+    private FileUtil fileUtil;
 
     public CashReader(String dirPath) {
         this.dirPath = dirPath;
+        this.fileUtil = new FileUtil();
         init();
     }
 
@@ -40,14 +43,11 @@ public class CashReader implements Reader {
 
     public <T> T getValue(Class<T> clazz) {
         String filePath = getFilePath(clazz);
-        try (FileInputStream in = new FileInputStream(filePath);
-             ObjectInputStream ois = new ObjectInputStream(in)) {
-
-            return clazz.cast(ois.readObject());
-        } catch (Exception e) {
-            e.printStackTrace();
+        Object obj = fileUtil.readObject(filePath);
+        if (obj == null) {
+            throw new RuntimeException("Can't read: " + filePath);
         }
-        return null;
+        return clazz.cast(obj);
     }
 
     public void saveToFileSystem() {
