@@ -26,25 +26,36 @@ public class EventMapper {
 
     public List<Event> mapToCashCategories(List<Event> p24) {
 
-        return p24.stream().map(event -> {
-            String category = event.getCategory();
-            if (category != null && categoryMap.containsKey(category)) {
-                event.setCategory(categoryMap.get(category));
-            } else {
-                addCategoryToCsv(category);
-            }
-            return event;
-        }).collect(Collectors.toList());
+        return p24.stream()
+                .map(event -> {
+                    String p24Category = event.getCategory();
+                    String cashCategory = mapCategoryToCash(p24Category);
+                    event.setCategory(cashCategory);
+                    return event;
+                })
+                .collect(Collectors.toList());
     }
+
+    public String mapCategoryToCash(String category) {
+        String result = category;
+        if (category != null && categoryMap.containsKey(category)) {
+            result = categoryMap.get(category);
+        } else {
+            if (category == null) {
+                category = "null";
+            }
+            categoryMap.put(category, category);
+            addCategoryToCsv(category);
+        }
+        return result;
+    }
+
 
     public static Map<String, List<Event>> groupByCategory(List<Event> events) {
         return events.stream().collect(Collectors.groupingBy(Event::getCategory));
     }
 
     public void addCategoryToCsv(String newCategory) {
-        if (newCategory == null) {
-            newCategory = "null";
-        }
         String filePath = getCsvFilePath();
         String line = "\n" + newCategory+ "," + newCategory;
         fileUtil.appendLine(line, filePath);

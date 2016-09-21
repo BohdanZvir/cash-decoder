@@ -2,6 +2,7 @@ package com.bzvir.reader;
 
 import com.burtyka.cash.core.*;
 import com.bzvir.model.Event;
+import com.bzvir.util.EventMapper;
 import com.bzvir.util.FileUtil;
 
 import java.util.*;
@@ -143,6 +144,7 @@ public class CashReader implements Reader {
         for (Map.Entry<String, List<Event>> entry : grouped.entrySet()) {
             String category = entry.getKey();
             Account account = getAccount(category);
+
             List<Event> events = entry.getValue();
             List<Transaction> transactions = createTransactions(events, account.getId());
             saveTransactions(transactions);
@@ -192,6 +194,7 @@ public class CashReader implements Reader {
     Account getAccount(String category) {
         Account account = findAccountByCategory(category);
         if (account == null) {
+            String newCategory = new EventMapper().mapCategoryToCash(category);
             account = createAccount(category);
             updateExpenseAccount(account);
         }
