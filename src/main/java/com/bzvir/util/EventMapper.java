@@ -24,18 +24,6 @@ public class EventMapper {
         return fileUtil.readCategoryCsvFile(csvFile);
     }
 
-    public List<Event> mapToCashCategories(List<Event> p24) {
-
-        return p24.stream()
-                .map(event -> {
-                    String p24Category = event.getCategory();
-                    String cashCategory = mapCategoryToCash(p24Category);
-                    event.setCategory(cashCategory);
-                    return event;
-                })
-                .collect(Collectors.toList());
-    }
-
     public String mapCategoryToCash(String category) {
         String result = category;
         if (category != null && categoryMap.containsKey(category)) {
@@ -49,7 +37,6 @@ public class EventMapper {
         }
         return result;
     }
-
 
     public static Map<String, List<Event>> groupByCategory(List<Event> events) {
         return events.stream().collect(Collectors.groupingBy(Event::getCategory));

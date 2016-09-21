@@ -11,6 +11,7 @@ import java.util.Map;
 import static com.bzvir.util.EventMapper.groupByCategory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mockito.Mockito.*;
 
@@ -28,25 +29,20 @@ public class EventsMapperTest extends AbstractTest {
 
     @Test
     public void categoryChangedForP24Event() {
-        Event p24 = dummyPrivat24Event("Перекази", "");
+        String p24 = "Перекази";
 
-        List<Event> list = mapper.mapToCashCategories(toList(p24));
-        Event cash = dummyPrivat24Event("transfers", "");
+        String actual = mapper.mapCategoryToCash(p24);
 
-        assertThat(list, hasItem(cash));
+        assertThat(actual, is("transfers"));
     }
 
     @Test
-    public void categoryChangedForTwoP24Event() {
-        Event p24_1 = dummyPrivat24Event("Перекази", "1");
-        Event p24_2 = dummyPrivat24Event("Оренда", "2");
+    public void anotherCategoryChangedForP24Event() {
+        String p24 = "Оренда";
 
-        List<Event> list = mapper.mapToCashCategories(toList(p24_1, p24_2));
-        Event cashP24_1 = dummyPrivat24Event("transfers", "1");
-        Event cashP24_2 = dummyPrivat24Event("rent", "2");
+        String actual = mapper.mapCategoryToCash(p24);
 
-        assertThat(list, hasItem(cashP24_1));
-        assertThat(list, hasItem(cashP24_2));
+        assertThat(actual, is("rent"));
     }
 
     @Test
@@ -86,15 +82,11 @@ public class EventsMapperTest extends AbstractTest {
     @Test
     public void nonExistingCategoryAddedToCsvFile() {
         String newCategory = "newUnderExpense";
-        Event p24_3 = dummyPrivat24Event(newCategory, "desc3");
-
         EventMapper spy = spy(mapper);
         doNothing().when(spy).addCategoryToCsv(newCategory);
 
-        List<Event> p24 = toList(p24_3);
-        List<Event> events = spy.mapToCashCategories(p24);
+        spy.mapCategoryToCash(newCategory);
 
-        assertThat(events, hasItem(p24_3));
         verify(spy).addCategoryToCsv(newCategory);
     }
 }
