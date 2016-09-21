@@ -32,19 +32,5 @@ public class DecoderTest extends AbstractTest {
         List<Event> cash = decoder.readCash();
         assertThat(cash, not(empty()));
     }
-//
-//    @Test
-//    public void categoryChangedForTwoP24EventSkippedForCash() {
-//        Event cash = dummyCashEvent("@string/leisure_activities", "cash");
-//        Event p24_1 = dummyPrivat24Event("Перекази", "1");
-//        Event p24_2 = dummyPrivat24Event("Оренда", "2");
-//
-//        List<Event> list = decoder.saveToCash(toList(p24_1, cash, p24_2));
-//        Event cashP24_1 = dummyPrivat24Event("transfers", "1");
-//        Event cashP24_2 = dummyPrivat24Event("rent", "2");
-//
-//        assertThat(list, hasItem(cash));
-//        assertThat(list, hasItem(cashP24_1));
-//        assertThat(list, hasItem(cashP24_2));
-//    }
+
 }

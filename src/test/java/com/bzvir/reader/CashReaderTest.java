@@ -241,4 +241,21 @@ public class CashReaderTest extends AbstractTest {
         assertTrue(tmFile.exists());
         assertTrue(stubTransManager + " should be deleted", tmFile.delete());
     }
+
+    @Test
+    public void categoryChangedForP24EventAndSkippedForCash() {
+        String cashCategory = "@string/leisure_activities";
+        String p24Category = "Перекази";
+        Event cash = dummyCashEvent(cashCategory, " cash");
+        Event p24_1 = dummyPrivat24Event(p24Category, " p24");
+
+        CashReader spy = spy(reader);
+        spy.reverseConvert(toList(p24_1, cash));
+
+        verify(spy).getAccount(cashCategory);
+        verify(spy).findAccountByCategory(cashCategory);
+        verify(spy).findAccountByCategory(p24Category);
+        verify(spy).createAccount("transfers");
+        verify(spy, never()).createAccount(cashCategory);
+    }
 }

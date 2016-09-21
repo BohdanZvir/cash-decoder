@@ -194,20 +194,24 @@ public class CashReader implements Reader {
     Account getAccount(String category) {
         Account account = findAccountByCategory(category);
         if (account == null) {
-            String newCategory = new EventMapper().mapCategoryToCash(category);
-            account = createAccount(category);
+            String mapped = mapCategory(category);
+            account = createAccount(mapped);
             updateExpenseAccount(account);
         }
         return account;
     }
 
-    private void updateExpenseAccount(Account account) {
+    private String mapCategory(String category) {
+        return new EventMapper().mapCategoryToCash(category);
+    }
+
+    private void updateExpenseAccount(Account newAccount) {
         Account expense = getExpenseAccount();
         List<Account> items = expense.getItems();
         if (items == null) {
             items = new ArrayList<>();
         }
-        items.add(account);
+        items.add(newAccount);
     }
 
     Account findAccountByCategory(String category) {

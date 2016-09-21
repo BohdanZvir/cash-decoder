@@ -86,9 +86,7 @@ public class Decoder {
     }
 
     public void saveToCash(List<Event> p24) {
-        EventMapper mapper = new EventMapper();
-        List<Event> cashP24 = mapper.mapToCashCategories(p24);
-        cashReader.reverseConvert(cashP24);
+        cashReader.reverseConvert(p24);
         cashReader.saveToFileSystem();
     }
 
