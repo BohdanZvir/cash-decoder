@@ -201,7 +201,7 @@ public class CashReader implements Reader {
         return account;
     }
 
-    private String mapCategory(String category) {
+    String mapCategory(String category) {
         return new EventMapper().mapCategoryToCash(category);
     }
 

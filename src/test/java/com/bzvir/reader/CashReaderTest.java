@@ -251,6 +251,7 @@ public class CashReaderTest extends AbstractTest {
 
         CashReader spy = spy(reader);
         spy.reverseConvert(toList(p24_1, cash));
+        doReturn("transfers").when(spy).mapCategory(p24Category);
 
         verify(spy).getAccount(cashCategory);
         verify(spy).findAccountByCategory(cashCategory);
