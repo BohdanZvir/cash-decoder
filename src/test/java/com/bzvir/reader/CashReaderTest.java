@@ -2,18 +2,20 @@ package com.bzvir.reader;
 
 import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
-import com.burtyka.cash.core.TransactionManager;
 import com.bzvir.model.Event;
 import com.bzvir.util.AbstractTest;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import java.io.File;
 import java.util.*;
 
 import static com.bzvir.reader.CashReader.CASH_ACCOUNT_ID;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -219,28 +221,34 @@ public class CashReaderTest extends AbstractTest {
         assertTrue(actual);
     }
 
-    @Test
-    public void accountAndTransactionsSavedToFileSystem() {
-        String stubAccount = SAMPLE_DIR + "account2.dat";
-        String stubTransManager = SAMPLE_DIR + "transactionalManager2.dat";
-        CashReader spy = spy(reader);
-
-        doReturn(stubAccount).when(spy).getFilePath(Account.class);
-        doReturn(stubTransManager).when(spy).getFilePath(TransactionManager.class);
-
-        spy.saveToFileSystem();
-
-        verify(spy).getFilePath(Account.class);
-        verify(spy).getFilePath(TransactionManager.class);
-
-        File accountFile = new File(stubAccount);
-        File tmFile = new File(stubTransManager);
-
-        assertTrue(accountFile.exists());
-        assertTrue(stubAccount + " should be deleted", accountFile.delete());
-        assertTrue(tmFile.exists());
-        assertTrue(stubTransManager + " should be deleted", tmFile.delete());
-    }
+//    @Captor
+//    private ArgumentCaptor<List<String>> captor;
+//
+//    @Mock
+//    private String dir;
+//    @InjectMocks
+//    private CashReader readerMock;
+//
+//    @Test(expected = FileNotFoundException.class)
+//    public void accountAndTransactionsSavedToFileSystem() {
+//        String stubAccount = SAMPLE_DIR + "account2.dat";
+//        String stubTransManager = SAMPLE_DIR + "transactionalManager2.dat";
+//
+//
+//        CashReader spy = spy(reader);
+//
+//        doReturn("").when(spy).getFilePath(argThat(Account.class));
+//        doReturn("").when(spy).getFilePath(TransactionManager.class);
+//
+//        spy.saveToFileSystem();
+//
+//        verify(spy).saveToFileSystem();
+//        verify(spy).writeToFile(captor.capture());
+//        List<String> ac = captor.<Account>getValue();
+//        verify(spy).writeToFile(Matchers.any(TransactionManager.class));
+//        verify(spy).getFilePath(TransactionManager.class);
+//
+//    }
 
     @Test
     public void categoryChangedForP24EventAndSkippedForCash() {
@@ -258,5 +266,6 @@ public class CashReaderTest extends AbstractTest {
         verify(spy).findAccountByCategory(p24Category);
         verify(spy).createAccount("transfers");
         verify(spy, never()).createAccount(cashCategory);
+        verify(spy, never()).mapCategory(cashCategory);
     }
 }
