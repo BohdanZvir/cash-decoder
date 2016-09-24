@@ -9,6 +9,10 @@ import java.util.Map;
  */
 public class FileUtil {
 
+    public FileUtil() {
+        super();
+    }
+
     public Object readObject(String filePath) {
         try (FileInputStream in = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(in)) {

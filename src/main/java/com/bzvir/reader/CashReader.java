@@ -30,9 +30,9 @@ public class CashReader implements Reader {
     private TransactionManager transactionManager;
     private FileUtil fileUtil;
 
-    public CashReader(String dirPath) {
+    public CashReader(String dirPath, FileUtil fileUtil) {
         this.dirPath = dirPath;
-        this.fileUtil = new FileUtil();
+        this.fileUtil = fileUtil;
         init();
     }
 
@@ -70,7 +70,7 @@ public class CashReader implements Reader {
     public List<Event> loadData() {
         Account expense = getExpenseAccount();
 
-        if (hasData(expense)) {
+        if (!hasData(expense)) {
             throw new RuntimeException("There are no items to work with.");
         }
         List<Account> items = expense.getItems();
@@ -78,9 +78,7 @@ public class CashReader implements Reader {
     }
 
     private boolean hasData(Account expense) {
-        return expense == null
-                || expense.getItems() == null
-                || expense.getItems().isEmpty();
+        return expense != null && isParent(expense);
     }
 
     Event constructEvent(Account account, Transaction transaction) {
@@ -96,7 +94,7 @@ public class CashReader implements Reader {
     }
 
     private Account getExpenseAccount() {
-        if (hasData(this.account)) {
+        if (!hasData(this.account)) {
             throw new RuntimeException("There are no account to wort with.");
         }
         List<Account> items = account.getItems();

@@ -24,11 +24,9 @@ public class Decoder {
 
     public Decoder() {
         resourceBundle = ResourceBundle.getBundle("application");
-        dirPath = System.getProperty("user.dir")
-                + resourceBundle.getString("sample.dir") + "/";
         String p24File = dirPath + resourceBundle.getString("p24.file");
         p24Reader = new Privat24XlsReader(p24File);
-        cashReader = new CashReader(dirPath);
+        cashReader = new CashReader(dirPath, new FileUtil());
     }
 
     private static void printJsonValue(Object object) {

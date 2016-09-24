@@ -18,7 +18,7 @@ public class AbstractTest {
     protected final static String SAMPLE_DIR = System.getProperty("user.dir") + "/sample data/";
 
     protected static ShortReporter constructShortReporter() {
-        Account account = new CashReader(SAMPLE_DIR).getValue(Account.class);
+        Account account = new CashReader(SAMPLE_DIR, new FileUtil()).getValue(Account.class);
 //        TransactionManager manager = Decoder.getValue(TransactionManager.class);
         return new ShortReporter(account);
     }

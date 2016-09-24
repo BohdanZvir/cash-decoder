@@ -2,21 +2,23 @@ package com.bzvir.reader;
 
 import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
+import com.burtyka.cash.core.TransactionManager;
 import com.bzvir.model.Event;
 import com.bzvir.util.AbstractTest;
+import com.bzvir.util.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static com.bzvir.reader.CashReader.CASH_ACCOUNT_ID;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -28,7 +30,7 @@ public class CashReaderTest extends AbstractTest {
 
     @Before
     public void setUp() {
-        reader = new CashReader(SAMPLE_DIR);
+        reader = new CashReader(SAMPLE_DIR, new FileUtil());
     }
 
     @Test
@@ -44,7 +46,7 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void sizeLoadedEventsFromCashGreater100() {
-        reader = new CashReader(SAMPLE_DIR);
+        reader = new CashReader(SAMPLE_DIR, new FileUtil());
         List<Event> events = reader.loadData();
 
         assertThat(events, hasSize(greaterThan(100)));
@@ -186,22 +188,21 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void dummyAccountSavedToFileSystem() {
-        String stubAccount = SAMPLE_DIR + "account2.dat";
 
-        File expectSaveTo = new File(stubAccount);
-        assertFalse(stubAccount + " shouldn't exist", expectSaveTo.exists());
+        File expectSaveTo = new File(SAMPLE_DIR + "account2.dat");
+        assertFalse(SAMPLE_DIR + "account2.dat" + " shouldn't exist", expectSaveTo.exists());
 
         Account cat = dummyAccount("id", "32323223");
 
         CashReader spy = spy(reader);
-        doReturn(stubAccount).when(spy).getFilePath(Account.class);
+        doReturn(SAMPLE_DIR + "account2.dat").when(spy).getFilePath(Account.class);
 
         spy.writeToFile(cat);
 
         verify(spy).getFilePath(Account.class);
 
         assertTrue(expectSaveTo.exists());
-        assertTrue(stubAccount + " should be deleted", expectSaveTo.delete());
+        assertTrue(SAMPLE_DIR + "account2.dat" + " should be deleted", expectSaveTo.delete());
     }
 
     @Test
@@ -221,34 +222,22 @@ public class CashReaderTest extends AbstractTest {
         assertTrue(actual);
     }
 
-//    @Captor
-//    private ArgumentCaptor<List<String>> captor;
-//
-//    @Mock
-//    private String dir;
-//    @InjectMocks
-//    private CashReader readerMock;
-//
-//    @Test(expected = FileNotFoundException.class)
-//    public void accountAndTransactionsSavedToFileSystem() {
-//        String stubAccount = SAMPLE_DIR + "account2.dat";
-//        String stubTransManager = SAMPLE_DIR + "transactionalManager2.dat";
-//
-//
-//        CashReader spy = spy(reader);
-//
-//        doReturn("").when(spy).getFilePath(argThat(Account.class));
-//        doReturn("").when(spy).getFilePath(TransactionManager.class);
-//
-//        spy.saveToFileSystem();
-//
-//        verify(spy).saveToFileSystem();
-//        verify(spy).writeToFile(captor.capture());
-//        List<String> ac = captor.<Account>getValue();
-//        verify(spy).writeToFile(Matchers.any(TransactionManager.class));
-//        verify(spy).getFilePath(TransactionManager.class);
-//
-//    }
+    @Test
+    public void accountAndTransactionsSavedToFileSystem() {
+        FileUtil fileUtilMock = mock(FileUtil.class);
+        when(fileUtilMock.readObject(SAMPLE_DIR+"account.dat")).thenReturn(new Account());
+        when(fileUtilMock.readObject(SAMPLE_DIR+"transactionManager.dat")).thenReturn(new TransactionManager());
+        doNothing().when(fileUtilMock).writeObject(instanceOf(Account.class), "ha");
+
+        CashReader spy = spy(new CashReader(SAMPLE_DIR, fileUtilMock));
+
+        doReturn("ha").when(spy).getFilePath(Account.class);
+        doReturn("ha").when(spy).getFilePath(TransactionManager.class);
+
+        spy.saveToFileSystem();
+
+        verify(spy, times(2)).writeToFile(any());
+    }
 
     @Test
     public void categoryChangedForP24EventAndSkippedForCash() {
