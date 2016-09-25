@@ -8,8 +8,8 @@ import com.bzvir.util.AbstractTest;
 import com.bzvir.util.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,9 +27,11 @@ import static org.mockito.Mockito.*;
 public class CashReaderTest extends AbstractTest {
 
     private CashReader reader;
+    private FileUtil fileUtilMock;
 
     @Before
     public void setUp() {
+        fileUtilMock = mock(FileUtil.class);
         reader = new CashReader(SAMPLE_DIR, new FileUtil());
     }
 
@@ -188,21 +190,21 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void dummyAccountSavedToFileSystem() {
-
-        File expectSaveTo = new File(SAMPLE_DIR + "account2.dat");
-        assertFalse(SAMPLE_DIR + "account2.dat" + " shouldn't exist", expectSaveTo.exists());
-
         Account cat = dummyAccount("id", "32323223");
+        FileUtil fileUtil = mock(FileUtil.class);
 
-        CashReader spy = spy(reader);
-        doReturn(SAMPLE_DIR + "account2.dat").when(spy).getFilePath(Account.class);
+        when(fileUtil.readObject(SAMPLE_DIR + "account.dat"))
+                .thenReturn(new Account());
+        when(fileUtil.readObject(SAMPLE_DIR + "transactionManager.dat"))
+                .thenReturn(new TransactionManager());
+        doNothing().when(fileUtil).writeObject(cat, SAMPLE_DIR + "account.dat");
+
+        CashReader spy = new CashReader(SAMPLE_DIR, fileUtil);
 
         spy.writeToFile(cat);
 
-        verify(spy).getFilePath(Account.class);
-
-        assertTrue(expectSaveTo.exists());
-        assertTrue(SAMPLE_DIR + "account2.dat" + " should be deleted", expectSaveTo.delete());
+        verify(fileUtil, times(2)).readObject(anyString());
+        verify(fileUtil).writeObject(ArgumentMatchers.isA(Account.class), anyString());
     }
 
     @Test
@@ -224,7 +226,6 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void accountAndTransactionsSavedToFileSystem() {
-        FileUtil fileUtilMock = mock(FileUtil.class);
         when(fileUtilMock.readObject(SAMPLE_DIR+"account.dat")).thenReturn(new Account());
         when(fileUtilMock.readObject(SAMPLE_DIR+"transactionManager.dat")).thenReturn(new TransactionManager());
         doNothing().when(fileUtilMock).writeObject(instanceOf(Account.class), "ha");
