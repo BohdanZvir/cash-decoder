@@ -32,6 +32,17 @@ public class CashReaderTest extends AbstractTest {
     @Before
     public void setUp() {
         fileUtilMock = mock(FileUtil.class);
+
+        when(fileUtilMock
+                .readObject(SAMPLE_DIR + "account.dat"))
+                .thenReturn(new Account());
+        when(fileUtilMock
+                .readObject(SAMPLE_DIR + "transactionManager.dat"))
+                .thenReturn(new TransactionManager());
+        doNothing()
+                .when(fileUtilMock)
+                .writeObject(any(), anyString());
+
         reader = new CashReader(SAMPLE_DIR, new FileUtil());
     }
 
@@ -47,12 +58,21 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
-    public void sizeLoadedEventsFromCashGreater100() {
-        reader = new CashReader(SAMPLE_DIR, new FileUtil());
+    public void sizeLoadedEventsFromCash() {
+        Account expense = createRootAccountWithExpense();
+        TransactionManager transactionManager = createTransactionalManagerForExpense();
+
+        FileUtil fileUtil = mock(FileUtil.class);
+        when(fileUtil.readObject(SAMPLE_DIR + "account.dat"))
+                .thenReturn(expense);
+
+        when(fileUtil.readObject(SAMPLE_DIR + "transactionManager.dat"))
+                .thenReturn(transactionManager);
+
+        reader = new CashReader(SAMPLE_DIR, fileUtil);
         List<Event> events = reader.loadData();
 
-        assertThat(events, hasSize(greaterThan(100)));
-        System.out.println("size :: " + events.size());
+        assertThat(events, hasSize(2));
     }
 
     @Test
@@ -190,21 +210,13 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void dummyAccountSavedToFileSystem() {
-        Account cat = dummyAccount("id", "32323223");
-        FileUtil fileUtil = mock(FileUtil.class);
+        Account dummy = dummyAccount("id", "32323223");
+        CashReader reader = new CashReader(SAMPLE_DIR, fileUtilMock);
 
-        when(fileUtil.readObject(SAMPLE_DIR + "account.dat"))
-                .thenReturn(new Account());
-        when(fileUtil.readObject(SAMPLE_DIR + "transactionManager.dat"))
-                .thenReturn(new TransactionManager());
-        doNothing().when(fileUtil).writeObject(cat, SAMPLE_DIR + "account.dat");
+        reader.writeToFile(dummy);
 
-        CashReader spy = new CashReader(SAMPLE_DIR, fileUtil);
-
-        spy.writeToFile(cat);
-
-        verify(fileUtil, times(2)).readObject(anyString());
-        verify(fileUtil).writeObject(ArgumentMatchers.isA(Account.class), anyString());
+        verify(fileUtilMock, times(2)).readObject(anyString());
+        verify(fileUtilMock).writeObject(ArgumentMatchers.isA(Account.class), anyString());
     }
 
     @Test
@@ -226,9 +238,7 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void accountAndTransactionsSavedToFileSystem() {
-        when(fileUtilMock.readObject(SAMPLE_DIR+"account.dat")).thenReturn(new Account());
-        when(fileUtilMock.readObject(SAMPLE_DIR+"transactionManager.dat")).thenReturn(new TransactionManager());
-        doNothing().when(fileUtilMock).writeObject(instanceOf(Account.class), "ha");
+       doNothing().when(fileUtilMock).writeObject(instanceOf(Account.class), "ha");
 
         CashReader spy = spy(new CashReader(SAMPLE_DIR, fileUtilMock));
 

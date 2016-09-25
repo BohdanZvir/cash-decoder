@@ -2,6 +2,7 @@ package com.bzvir.util;
 
 import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
+import com.burtyka.cash.core.TransactionManager;
 import com.bzvir.model.Event;
 import com.bzvir.reader.CashReader;
 import com.bzvir.report.ShortReporter;
@@ -107,4 +108,29 @@ public class AbstractTest {
     protected <T> List<T> toList(T... objects){
         return Arrays.asList(objects);
     }
+
+    // returns root account with expense as child and
+    // dummy with id="id-dummy" as grand-child
+    protected Account createRootAccountWithExpense() {
+        Account root = dummyAccount("id-root", "root");
+        Account expenses = dummyAccount("id-expenses", "expenses");
+        Account account = dummyAccount("id-dummy", "dummy");
+        List<Account> underExpenses = toList(account);
+        expenses.setItems(underExpenses);
+        List<Account> underRoot = toList(expenses);
+        root.setItems(underRoot);
+        return root;
+    }
+
+    //returns transactionManager with
+    // two transactions attached to accountId = "id-dummy"
+    protected TransactionManager createTransactionalManagerForExpense() {
+        TransactionManager manager = new TransactionManager();
+        Transaction trans1 = dummyTransaction("id-dummy", "trans-1");
+        Transaction trans2 = dummyTransaction("id-dummy", "trans-2");
+        List<Transaction> transactions = toList(trans1, trans2);
+        manager.setTransasctions(transactions);
+        return manager;
+    }
+
 }
