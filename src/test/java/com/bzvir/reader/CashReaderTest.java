@@ -192,7 +192,7 @@ public class CashReaderTest extends AbstractTest {
         CashReader spy = spy(reader);
         doReturn(account).when(spy).createAccount(category);
 
-        spy.reverseConvert(toList(p24));
+        spy.convertFromEvent(toList(p24));
 
         verify(spy).createAccount(category);
         verify(spy).getTransactions();
@@ -244,7 +244,7 @@ public class CashReaderTest extends AbstractTest {
         CashReader spy = spy(reader);
         doReturn("transfers").when(spy).mapCategory(p24Category);
 
-        spy.reverseConvert(toList(p24_1, cash));
+        spy.convertFromEvent(toList(p24_1, cash));
 
         verify(spy).getAccount(cashCategory);
         verify(spy).findAccountByCategory(cashCategory);

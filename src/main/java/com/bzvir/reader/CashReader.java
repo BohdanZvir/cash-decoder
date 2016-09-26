@@ -137,7 +137,7 @@ public class CashReader implements Reader {
     }
 
     @Override
-    public void reverseConvert(List<Event> p24) {
+    public void convertFromEvent(List<Event> p24) {
         Map<String, List<Event>> grouped = groupByCategory(p24);
 
         for (Map.Entry<String, List<Event>> entry : grouped.entrySet()) {

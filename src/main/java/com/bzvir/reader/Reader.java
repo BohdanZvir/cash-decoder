@@ -11,6 +11,6 @@ import java.util.Set;
 public interface Reader {
 
     List<Event> loadData();
-    void reverseConvert(List<Event> p24);
+    void convertFromEvent(List<Event> p24);
     void saveToFileSystem();
 }

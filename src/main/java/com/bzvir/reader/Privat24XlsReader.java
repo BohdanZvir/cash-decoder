@@ -76,7 +76,7 @@ public class Privat24XlsReader implements Reader {
     }
 
     @Override
-    public void reverseConvert(List<Event> p24) {
+    public void convertFromEvent(List<Event> p24) {
     }
 
     @Override

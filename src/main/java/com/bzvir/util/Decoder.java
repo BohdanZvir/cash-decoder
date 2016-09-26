@@ -84,7 +84,7 @@ public class Decoder {
     }
 
     public void saveToCash(List<Event> p24) {
-        cashReader.reverseConvert(p24);
+        cashReader.convertFromEvent(p24);
         cashReader.saveToFileSystem();
     }
 
