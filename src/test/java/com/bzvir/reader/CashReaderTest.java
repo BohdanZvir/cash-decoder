@@ -31,19 +31,22 @@ public class CashReaderTest extends AbstractTest {
 
     @Before
     public void setUp() {
-        fileUtilMock = mock(FileUtil.class);
+        String directory = "";
+        Account account = createRootAccountWithExpense();
+        TransactionManager manager = createTransactionalManagerForExpense();
 
+        fileUtilMock = mock(FileUtil.class);
         when(fileUtilMock
-                .readObject(SAMPLE_DIR + "account.dat"))
-                .thenReturn(new Account());
+                .readObject(directory + "account.dat"))
+                .thenReturn(account);
         when(fileUtilMock
-                .readObject(SAMPLE_DIR + "transactionManager.dat"))
-                .thenReturn(new TransactionManager());
+                .readObject(directory + "transactionManager.dat"))
+                .thenReturn(manager);
         doNothing()
                 .when(fileUtilMock)
                 .writeObject(any(), anyString());
 
-        reader = new CashReader(SAMPLE_DIR, new FileUtil());
+        reader = new CashReader(directory, fileUtilMock);
     }
 
     @Test
@@ -59,17 +62,6 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void sizeLoadedEventsFromCash() {
-        Account expense = createRootAccountWithExpense();
-        TransactionManager transactionManager = createTransactionalManagerForExpense();
-
-        FileUtil fileUtil = mock(FileUtil.class);
-        when(fileUtil.readObject(SAMPLE_DIR + "account.dat"))
-                .thenReturn(expense);
-
-        when(fileUtil.readObject(SAMPLE_DIR + "transactionManager.dat"))
-                .thenReturn(transactionManager);
-
-        reader = new CashReader(SAMPLE_DIR, fileUtil);
         List<Event> events = reader.loadData();
 
         assertThat(events, hasSize(2));
@@ -115,14 +107,14 @@ public class CashReaderTest extends AbstractTest {
         Transaction trans3 = dummyTransaction(childId_1, "3 child 1");
         Transaction trans4 = dummyTransaction(childId_2, "4 child 2");
 
-        CashReader spyReader = spy(reader);
+        CashReader spy = spy(reader);
         doReturn(toList(trans1, trans2, trans3, trans4))
-                .when(spyReader).getTransactions();
+                .when(spy).getTransactions();
 
         List<Account> accounts = Collections.singletonList(parent);
-        List<Event> events = spyReader.aggregateEvents(accounts);
+        List<Event> events = spy.aggregateEvents(accounts);
 
-        verify(spyReader, times(2)).getTransactions();
+        verify(spy, times(2)).getTransactions();
         assertThat(events, hasSize(4));
     }
 
@@ -146,7 +138,8 @@ public class CashReaderTest extends AbstractTest {
         parent.setItems(toList(expected));
 
         CashReader spy = spy(reader);
-        doReturn(spy.findAccountByCategory(category, parent)).when(spy).findAccountByCategory(category);
+        Account byCategory = spy.findAccountByCategory(category, parent);
+        doReturn(byCategory).when(spy).findAccountByCategory(category);
 
         Account actual = spy.getAccount(category);
 
@@ -191,7 +184,7 @@ public class CashReaderTest extends AbstractTest {
     public void accountAndTransactionCreatedFromEvent() {
         String description = "event";
         String category = "cat0";
-        Event event = dummyPrivat24Event(category, description);
+        Event p24 = dummyPrivat24Event(category, description);
 
         String accountId = "accountId";
         Account account = dummyAccount(accountId, category);
@@ -199,19 +192,17 @@ public class CashReaderTest extends AbstractTest {
         CashReader spy = spy(reader);
         doReturn(account).when(spy).createAccount(category);
 
-        List<Event> p24 = toList(event);
-        spy.reverseConvert(p24);
+        spy.reverseConvert(toList(p24));
 
         verify(spy).createAccount(category);
         verify(spy).getTransactions();
-        verify(spy).createTransaction(event, accountId);
+        verify(spy).createTransaction(p24, accountId);
         assertThat(spy.findTransactions(account), notNullValue());
     }
 
     @Test
     public void dummyAccountSavedToFileSystem() {
         Account dummy = dummyAccount("id", "32323223");
-        CashReader reader = new CashReader(SAMPLE_DIR, fileUtilMock);
 
         reader.writeToFile(dummy);
 
@@ -238,28 +229,22 @@ public class CashReaderTest extends AbstractTest {
 
     @Test
     public void accountAndTransactionsSavedToFileSystem() {
-       doNothing().when(fileUtilMock).writeObject(instanceOf(Account.class), "ha");
+        reader.saveToFileSystem();
 
-        CashReader spy = spy(new CashReader(SAMPLE_DIR, fileUtilMock));
-
-        doReturn("ha").when(spy).getFilePath(Account.class);
-        doReturn("ha").when(spy).getFilePath(TransactionManager.class);
-
-        spy.saveToFileSystem();
-
-        verify(spy, times(2)).writeToFile(any());
+        verify(fileUtilMock, times(2)).writeObject(any(), anyString());
     }
 
     @Test
     public void categoryChangedForP24EventAndSkippedForCash() {
-        String cashCategory = "@string/leisure_activities";
+        String cashCategory = "dummy";
         String p24Category = "Перекази";
         Event cash = dummyCashEvent(cashCategory, " cash");
         Event p24_1 = dummyPrivat24Event(p24Category, " p24");
 
         CashReader spy = spy(reader);
-        spy.reverseConvert(toList(p24_1, cash));
         doReturn("transfers").when(spy).mapCategory(p24Category);
+
+        spy.reverseConvert(toList(p24_1, cash));
 
         verify(spy).getAccount(cashCategory);
         verify(spy).findAccountByCategory(cashCategory);

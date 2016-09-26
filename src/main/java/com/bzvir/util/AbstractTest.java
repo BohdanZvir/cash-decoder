@@ -9,6 +9,7 @@ import com.bzvir.report.ShortReporter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -115,7 +116,7 @@ public class AbstractTest {
         Account root = dummyAccount("id-root", "root");
         Account expenses = dummyAccount("id-expenses", "expenses");
         Account account = dummyAccount("id-dummy", "dummy");
-        List<Account> underExpenses = toList(account);
+        List<Account> underExpenses = new LinkedList<>(toList(account));
         expenses.setItems(underExpenses);
         List<Account> underRoot = toList(expenses);
         root.setItems(underRoot);
@@ -128,7 +129,7 @@ public class AbstractTest {
         TransactionManager manager = new TransactionManager();
         Transaction trans1 = dummyTransaction("id-dummy", "trans-1");
         Transaction trans2 = dummyTransaction("id-dummy", "trans-2");
-        List<Transaction> transactions = toList(trans1, trans2);
+        List<Transaction> transactions = new ArrayList<>(toList(trans1, trans2));
         manager.setTransasctions(transactions);
         return manager;
     }
