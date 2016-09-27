@@ -7,8 +7,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -17,20 +16,32 @@ import java.util.*;
 public class Privat24XlsReader implements Reader {
 
     private Sheet sheet;
+    private Workbook wb;
+    private String filePath;
 
     public Privat24XlsReader(String filePath) {
+        this.filePath = filePath;
         sheet = loadFirstSheet(filePath);
     }
 
     public Sheet loadFirstSheet(String filePath) {
-        Workbook wb = null;
+        Workbook wb = getXlsWorkbook(filePath);
+        return (wb != null) ? wb.getSheetAt(0) : null;
+    }
+
+    Workbook getXlsWorkbook(String filePath) {
+        if (wb != null
+                && (this.filePath != null
+                && this.filePath.equalsIgnoreCase(filePath))) {
+            return wb;
+        }
         try {
             FileInputStream file = new FileInputStream(new File(filePath));
             wb = new HSSFWorkbook(file);  //-xls
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return (wb != null) ? wb.getSheetAt(0) : null;
+        return wb;
     }
 
     Set<String> getTitles() {
@@ -77,13 +88,23 @@ public class Privat24XlsReader implements Reader {
 
     @Override
     public void convertFromEvent(List<Event> p24) {
+        // convert to Row.class objects
+        // append to existed and sort it by date
+        // update xls sheet with brand new Row list
     }
 
     @Override
     public void saveToFileSystem() {
+        //TODO add test
+        Workbook workbook = getXlsWorkbook(this.filePath);
+        try (FileOutputStream outFile = new FileOutputStream(this.filePath)){
+            workbook.write(outFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Event constructEvent(Row row) {
+    Event constructEvent(Row row) {
         Event event = new Event();
         List<String> p24Titles = readRowTitles();
 
