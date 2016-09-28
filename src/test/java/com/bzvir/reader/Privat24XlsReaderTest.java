@@ -4,16 +4,19 @@ import com.bzvir.model.Event;
 import com.bzvir.util.AbstractTest;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by bohdan.
@@ -32,7 +35,7 @@ public class Privat24XlsReaderTest extends AbstractTest {
 
     @Test
     public void loadXlsSheetModel() {
-        assertThat(sheet, isA(Sheet.class));
+        assertThat(sheet, Matchers.isA(Sheet.class));
         Iterator<Row> rowIterator = sheet.rowIterator();
         assertThat(true, is(rowIterator.hasNext()));
     }
@@ -55,7 +58,7 @@ public class Privat24XlsReaderTest extends AbstractTest {
         Row row = sheet.getRow(2);
         Event event = reader.constructEvent(row);
 
-        assertThat(event, isA(Event.class));
+        assertThat(event, Matchers.isA(Event.class));
         assertThat(event.getProperty("Сума у валюті картки"), instanceOf(Double.class));
         assertThat(event.getProperty("Дата"), instanceOf(String.class));
         assertThat(event.getProperty("Опис операції"), instanceOf(String.class));
@@ -64,4 +67,16 @@ public class Privat24XlsReaderTest extends AbstractTest {
     }
 
 
+    @Test
+    public void xlsFileUpdate() throws IOException {
+        Workbook workbook = mock(Workbook.class);
+        doNothing().when(workbook).write(any());
+
+        Privat24XlsReader spy = spy(reader);
+        doReturn(workbook).when(spy).getXlsWorkbook(anyString());
+
+        spy.saveToFileSystem();
+
+        verify(spy).getXlsWorkbook(anyString());
+    }
 }
