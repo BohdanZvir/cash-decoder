@@ -21,10 +21,10 @@ public class Privat24XlsReader implements Reader {
 
     public Privat24XlsReader(String filePath) {
         this.filePath = filePath;
-        sheet = loadFirstSheet(filePath);
+        sheet = loadFirstSheet();
     }
 
-    public Sheet loadFirstSheet(String filePath) {
+    Sheet loadFirstSheet() {
         Workbook wb = getXlsWorkbook(filePath);
         return (wb != null) ? wb.getSheetAt(0) : null;
     }
@@ -44,7 +44,7 @@ public class Privat24XlsReader implements Reader {
         return wb;
     }
 
-    Set<String> getTitles() {
+    private Set<String> getTitles() {
         return new LinkedHashSet<>(Arrays.asList(
                 "Категорія",
                 "Дата",
@@ -70,7 +70,7 @@ public class Privat24XlsReader implements Reader {
     boolean checkTitlesOnPresence() {
         Set<String> expected = getTitles();
         List<String> actual = readRowTitles();
-        return actual.containsAll(expected);
+        return (actual != null) && actual.containsAll(expected);
     }
 
     public List<Event> loadData()  {

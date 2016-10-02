@@ -30,14 +30,19 @@ public class Privat24XlsReaderTest extends AbstractTest {
     public void setUp() {
         String filePath = SAMPLE_DIR + "statements.xls";
         reader = new Privat24XlsReader(filePath);
-        sheet = reader.loadFirstSheet(filePath);
+        sheet = reader.loadFirstSheet();
     }
 
     @Test
-    public void loadXlsSheetModel() {
+    public void loadP24XlsSheetModel() {
+        Sheet sheet = reader.loadFirstSheet();
+
         assertThat(sheet, Matchers.isA(Sheet.class));
         Iterator<Row> rowIterator = sheet.rowIterator();
+
         assertThat(true, is(rowIterator.hasNext()));
+        assertThat("There is no title row", sheet.getRow(1), notNullValue());
+        assertThat("There is no at least one data row", sheet.getRow(2), notNullValue());
     }
 
     @Test
