@@ -24,6 +24,8 @@ public class Decoder {
 
     public Decoder() {
         resourceBundle = ResourceBundle.getBundle("application");
+        dirPath = System.getProperty("user.dir")
+                + resourceBundle.getString("sample.dir") + "/";
         String p24File = dirPath + resourceBundle.getString("p24.file");
         FileUtil fileUtil = new FileUtil();
         p24Reader = new Privat24XlsReader(p24File, fileUtil);
