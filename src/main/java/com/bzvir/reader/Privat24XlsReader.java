@@ -1,6 +1,7 @@
 package com.bzvir.reader;
 
 import com.bzvir.model.Event;
+import com.bzvir.util.FileUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,21 +19,21 @@ public class Privat24XlsReader implements Reader {
     private Sheet sheet;
     private Workbook wb;
     private String filePath;
+    private FileUtil fileUtil;
 
-    public Privat24XlsReader(String filePath) {
+    public Privat24XlsReader(String filePath, FileUtil fileUtil) {
         this.filePath = filePath;
         sheet = loadFirstSheet();
+        this.fileUtil = fileUtil;
     }
 
     Sheet loadFirstSheet() {
-        Workbook wb = getXlsWorkbook(filePath);
+        Workbook wb = getXlsWorkbook();
         return (wb != null) ? wb.getSheetAt(0) : null;
     }
 
-    Workbook getXlsWorkbook(String filePath) {
-        if (wb != null
-                && (this.filePath != null
-                && this.filePath.equalsIgnoreCase(filePath))) {
+    private Workbook getXlsWorkbook() {
+        if (wb != null) {
             return wb;
         }
         try {
@@ -95,13 +96,8 @@ public class Privat24XlsReader implements Reader {
 
     @Override
     public void saveToFileSystem() {
-        //TODO add test
-        Workbook workbook = getXlsWorkbook(this.filePath);
-        try (FileOutputStream outFile = new FileOutputStream(this.filePath)){
-            workbook.write(outFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Workbook workbook = getXlsWorkbook();
+        fileUtil.updateWorkbook(workbook, this.filePath);
     }
 
     Event constructEvent(Row row) {

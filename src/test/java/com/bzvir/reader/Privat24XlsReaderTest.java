@@ -2,6 +2,7 @@ package com.bzvir.reader;
 
 import com.bzvir.model.Event;
 import com.bzvir.util.AbstractTest;
+import com.bzvir.util.FileUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -29,7 +30,7 @@ public class Privat24XlsReaderTest extends AbstractTest {
     @Before
     public void setUp() {
         String filePath = SAMPLE_DIR + "statements.xls";
-        reader = new Privat24XlsReader(filePath);
+        reader = new Privat24XlsReader(filePath, new FileUtil());
         sheet = reader.loadFirstSheet();
     }
 
@@ -71,17 +72,16 @@ public class Privat24XlsReaderTest extends AbstractTest {
         assertThat(event.getProperty("Валюта картки"), instanceOf(String.class));
     }
 
-
     @Test
     public void xlsFileUpdate() throws IOException {
-        Workbook workbook = mock(Workbook.class);
-        doNothing().when(workbook).write(any());
+        String filePath = SAMPLE_DIR + "statements.xls";
+        FileUtil fileUtilMock = mock(FileUtil.class);
+        doNothing().when(fileUtilMock).updateWorkbook(any(Workbook.class), anyString());
 
-        Privat24XlsReader spy = spy(reader);
-        doReturn(workbook).when(spy).getXlsWorkbook(anyString());
+        Privat24XlsReader readerMock = new Privat24XlsReader(filePath, fileUtilMock);
 
-        spy.saveToFileSystem();
+        readerMock.saveToFileSystem();
 
-        verify(spy).getXlsWorkbook(anyString());
+        verify(fileUtilMock).updateWorkbook(any(Workbook.class), anyString());
     }
 }

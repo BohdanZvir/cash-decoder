@@ -25,8 +25,9 @@ public class Decoder {
     public Decoder() {
         resourceBundle = ResourceBundle.getBundle("application");
         String p24File = dirPath + resourceBundle.getString("p24.file");
-        p24Reader = new Privat24XlsReader(p24File);
-        cashReader = new CashReader(dirPath, new FileUtil());
+        FileUtil fileUtil = new FileUtil();
+        p24Reader = new Privat24XlsReader(p24File, fileUtil);
+        cashReader = new CashReader(dirPath, fileUtil);
     }
 
     private static void printJsonValue(Object object) {
@@ -83,7 +84,7 @@ public class Decoder {
         return cashReader.loadData();
     }
 
-    public void saveToCash(List<Event> p24) {
+    private void saveToCash(List<Event> p24) {
         cashReader.convertFromEvent(p24);
         cashReader.saveToFileSystem();
     }

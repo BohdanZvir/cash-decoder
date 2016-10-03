@@ -1,5 +1,7 @@
 package com.bzvir.util;
 
+import org.apache.poi.ss.usermodel.Workbook;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +63,14 @@ public class FileUtil {
             PrintWriter out = new PrintWriter(bw))
         {
             out.printf(newLine);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateWorkbook(Workbook workbook, String filePath) {
+        try (FileOutputStream outFile = new FileOutputStream(filePath)){
+            workbook.write(outFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
