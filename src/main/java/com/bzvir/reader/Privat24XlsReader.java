@@ -8,7 +8,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.*;
 
 /**
@@ -47,17 +48,17 @@ public class Privat24XlsReader implements Reader {
 
     private Set<String> getTitles() {
         return new LinkedHashSet<>(Arrays.asList(
-                "Категорія",
                 "Дата",
                 "Час",
-                "Сума у валюті картки",
+                "Категорія",
+                "Картка",
                 "Опис операції",
-                "Валюта картки"
-//                "Картка",
-//                "Сума у валюті транзакції",
-//                "Валюта транзакції",
-//                "Залишок на кінець періоду",
-//                "Валюта залишку"
+                "Сума у валюті картки",
+                "Валюта картки",
+                "Сума у валюті транзакції",
+                "Валюта транзакції",
+                "Залишок на кінець періоду",
+                "Валюта залишку"
         ));
     }
 
@@ -82,16 +83,43 @@ public class Privat24XlsReader implements Reader {
         List<Event> events = new LinkedList<>();
         for (int i = 2; i < sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
-            events.add(constructEvent(row));
+            if (row != null) {
+                events.add(constructEvent(row));
+            }
         }
         return events;
     }
 
     @Override
-    public void convertFromEvent(List<Event> p24) {
-        // convert to Row.class objects
-        // append to existed and sort it by date
-        // update xls sheet with brand new Row list
+    public void convertFromEvent(List<Event> events) {
+        List<Row> list = new LinkedList<>();
+        for (Event event : events) {
+            Row newRow = getNewRow();
+            list.add(mapToRow(event, newRow));
+        }
+        updateWorkbook(list);
+    }
+
+    private Row getNewRow() {
+        int lastRowToShift = sheet.getLastRowNum();
+        sheet.shiftRows(lastRowToShift, lastRowToShift, 1);
+        return sheet.createRow(lastRowToShift);
+    }
+
+    private Row mapToRow(Event event, Row row) {
+        for (int i = 0; i < getTitles().size(); i++) {
+            List<String> titles = new ArrayList<>(getTitles());
+            Object cellValue = event.getProperty(titles.get(i));
+            if (i == 2) { // resolve Category
+                cellValue = event.getCategory();
+            }
+            createCell(row, i, cellValue instanceof String ? (String) cellValue : "");
+        }
+        return row;
+    }
+
+    private void createCell(Row row, int column, String value) {
+        row.createCell(column).setCellValue(value);
     }
 
     @Override
@@ -116,5 +144,10 @@ public class Privat24XlsReader implements Reader {
             }
         }
         return event;
+    }
+
+    void updateWorkbook(List<Row> rows) {
+        //TODO sort rows by date & time
+        //TODO test
     }
 }
