@@ -92,12 +92,12 @@ public class Privat24XlsReader implements Reader {
 
     @Override
     public void convertFromEvent(List<Event> events) {
-        List<Row> list = new LinkedList<>();
+        //TODO sort rows by date & time
         for (Event event : events) {
             Row newRow = getNewRow();
-            list.add(mapToRow(event, newRow));
+            mapToRow(event, newRow);
         }
-        updateWorkbook(list);
+        updateWorkbook();
     }
 
     private Row getNewRow() {
@@ -106,7 +106,7 @@ public class Privat24XlsReader implements Reader {
         return sheet.createRow(lastRowToShift);
     }
 
-    private Row mapToRow(Event event, Row row) {
+    Row mapToRow(Event event, Row row) {
         for (int i = 0; i < getTitles().size(); i++) {
             List<String> titles = new ArrayList<>(getTitles());
             Object cellValue = event.getProperty(titles.get(i));
@@ -124,8 +124,7 @@ public class Privat24XlsReader implements Reader {
 
     @Override
     public void saveToFileSystem() {
-        Workbook workbook = getXlsWorkbook();
-        fileUtil.updateWorkbook(workbook, this.filePath);
+        updateWorkbook();
     }
 
     Event constructEvent(Row row) {
@@ -146,8 +145,7 @@ public class Privat24XlsReader implements Reader {
         return event;
     }
 
-    void updateWorkbook(List<Row> rows) {
-        //TODO sort rows by date & time
-        //TODO test
+    void updateWorkbook() {
+        fileUtil.updateWorkbook(this.wb, this.filePath);
     }
 }

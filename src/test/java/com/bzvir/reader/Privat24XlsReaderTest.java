@@ -89,7 +89,7 @@ public class Privat24XlsReaderTest extends AbstractTest {
     @Test
     public void convertFromEventToRow() {
         Privat24XlsReader spy = spy(reader);
-        doNothing().when(spy).updateWorkbook(any(List.class));
+        doNothing().when(spy).updateWorkbook();
 
         String data1 = "data 1";
         String time1 = "time 1";
@@ -99,13 +99,13 @@ public class Privat24XlsReaderTest extends AbstractTest {
         Event event2 = dummyEvent("cat2", data2, time2, "desc2");
         spy.convertFromEvent(toList(event1, event2));
 
-        ArgumentCaptor<List<Row>> rows = ArgumentCaptor.forClass(List.class);
-        verify(spy).updateWorkbook(rows.capture());
+        ArgumentCaptor<Row> rows = ArgumentCaptor.forClass(Row.class);
+        verify(spy, times(2)).mapToRow(any(), rows.capture());
 
-        Row actual1 = rows.getValue().get(0);
+        Row actual1 = rows.getAllValues().get(0);
         assertEquals(data1, actual1.getCell(0).getStringCellValue());
         assertEquals(time1, actual1.getCell(1).getStringCellValue());
-        Row actual2 = rows.getValue().get(1);
+        Row actual2 = rows.getAllValues().get(1);
         assertEquals(data2, actual2.getCell(0).getStringCellValue());
         assertEquals(time2, actual2.getCell(1).getStringCellValue());
     }
