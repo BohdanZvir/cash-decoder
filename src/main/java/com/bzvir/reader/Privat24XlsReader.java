@@ -10,7 +10,11 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Created by bohdan.
@@ -92,12 +96,29 @@ public class Privat24XlsReader implements Reader {
 
     @Override
     public void convertFromEvent(List<Event> events) {
-        //TODO sort rows by date & time
-        for (Event event : events) {
-            Row newRow = getNewRow();
-            mapToRow(event, newRow);
-        }
+        Comparator<Event> increaseDateTime = (e1, e2) -> readDateTime(e1).compareTo(readDateTime(e2));
+
+        events.stream().sorted(increaseDateTime).forEach(e ->
+                {
+                    Row newRow = getNewRow();
+                    mapToRow(e, newRow);
+                });
         updateWorkbook();
+    }
+
+    private LocalDateTime readDateTime(Event event) {
+        return readDateTime(
+                (String) event.getProperty("Дата"),
+                (String) event.getProperty("Час"));
+    }
+
+    private LocalDateTime readDateTime(String date, String time) {
+        String text = Objects.requireNonNull(date) + '|';
+        String datePattern = "dd.MM.yyyy|HH:mm";
+        text += (isNullOrEmpty(time)) ? "00:00" : time;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern);
+        return LocalDateTime.parse(text, formatter);
     }
 
     private Row getNewRow() {
@@ -145,7 +166,7 @@ public class Privat24XlsReader implements Reader {
         return event;
     }
 
-    void updateWorkbook() {
+    private void updateWorkbook() {
         fileUtil.updateWorkbook(this.wb, this.filePath);
     }
 }

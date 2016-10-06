@@ -61,7 +61,7 @@ public class CashReader implements Reader {
         fileUtil.writeObject(root, filePath);
     }
 
-    String getFilePath(Class clazz) {
+    private String getFilePath(Class clazz) {
         String filename = files.get(clazz);
         return dirPath + filename;
     }
@@ -70,15 +70,15 @@ public class CashReader implements Reader {
     public List<Event> loadData() {
         Account expense = getExpenseAccount();
 
-        if (!hasData(expense)) {
+        if (hasNoData(expense)) {
             throw new RuntimeException("There are no items to work with.");
         }
         List<Account> items = expense.getItems();
         return aggregateEvents(items);
     }
 
-    private boolean hasData(Account expense) {
-        return expense != null && isParent(expense);
+    private boolean hasNoData(Account expense) {
+        return expense == null || !isParent(expense);
     }
 
     Event constructEvent(Account account, Transaction transaction) {
@@ -94,16 +94,14 @@ public class CashReader implements Reader {
     }
 
     private Account getExpenseAccount() {
-        if (!hasData(this.account)) {
+        if (hasNoData(this.account)) {
             throw new RuntimeException("There are no account to wort with.");
         }
         List<Account> items = account.getItems();
-        for (Account item : items) {
-            if (item.getName().contains("expenses")) {
-                return item;
-            }
-        }
-        throw new RuntimeException("Can't find Expenses account.");
+        return items.stream()
+                .filter(item -> item.getName().contains("expenses"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Can't find Expenses account."));
     }
 
     List<Event> aggregateEvents(List<Account> items) {
