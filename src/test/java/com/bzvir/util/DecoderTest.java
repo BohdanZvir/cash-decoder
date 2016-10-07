@@ -20,17 +20,17 @@ public class DecoderTest extends AbstractTest {
     public void setup() {
         decoder = new Decoder();
     }
-
-    @Test
-    public void readP24Events() {
-        List<Event> p24 = decoder.readP24();
-        assertThat(p24, not(empty()));
-    }
-
-    @Test
-    public void readCashEvents() {
-        List<Event> cash = decoder.readCash();
-        assertThat(cash, not(empty()));
-    }
+//
+//    @Test
+//    public void readP24Events() {
+//        List<Event> p24 = decoder.readP24();
+//        assertThat(p24, not(empty()));
+//    }
+//
+//    @Test
+//    public void readCashEvents() {
+//        List<Event> cash = decoder.readCash();
+//        assertThat(cash, not(empty()));
+//    }
 
 }

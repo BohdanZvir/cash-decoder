@@ -2,9 +2,8 @@ package com.bzvir.util;
 
 import com.burtyka.cash.core.Transaction;
 import com.bzvir.model.Event;
-import com.bzvir.reader.CashReader;
-import com.bzvir.reader.Privat24XlsReader;
 import com.bzvir.reader.Reader;
+import com.bzvir.reader.ReaderFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.unsynchronized.jdeserialize;
@@ -12,25 +11,8 @@ import org.unsynchronized.jdeserialize;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class Decoder {
-
-    private static String dirPath;
-    private static ResourceBundle resourceBundle;
-
-    private Reader p24Reader;
-    private Reader cashReader;
-
-    public Decoder() {
-        resourceBundle = ResourceBundle.getBundle("application");
-        dirPath = System.getProperty("user.dir")
-                + resourceBundle.getString("sample.dir") + "/";
-        String p24File = dirPath + resourceBundle.getString("p24.file");
-        FileUtil fileUtil = new FileUtil();
-        p24Reader = new Privat24XlsReader(p24File, fileUtil);
-        cashReader = new CashReader(dirPath, fileUtil);
-    }
 
     private static void printJsonValue(Object object) {
         ObjectMapper mapper = new ObjectMapper();
@@ -73,26 +55,27 @@ public class Decoder {
 
     public static void main(String[] args) {
 //        jDeserial(dirPath + "settings.dat");
-        String dataFilePath = dirPath + "settings.dat";
+//        String dataFilePath = dirPath + "settings.dat";
         ClassGenerator generator = new ClassGenerator();
 //        Class loadedClass = generator.generateClassDeclarations(dataFilePath);
+
+
+        new Decoder().doWork();
     }
 
-    public List<Event> readP24() {
-        return p24Reader.loadData();
-    }
+    public void doWork() {
+        Reader source;
+        Reader target;
+        if (/*source is cash == */true) {
+            source = ReaderFactory.createCashReader();
+            target = ReaderFactory.createP24Reader();
+        } else {
+            source = ReaderFactory.createP24Reader();
+            target = ReaderFactory.createCashReader();
+        }
 
-    public List<Event> readCash() {
-        return cashReader.loadData();
-    }
-
-    private void saveToCash(List<Event> p24) {
-        cashReader.convertFromEvent(p24);
-        cashReader.saveToFileSystem();
-    }
-
-    public void updateCash() {
-        List<Event> p24 = readP24();
-        saveToCash(p24);
+        List<Event> events = source.loadData();
+        target.convertFromEvent(events);
+        target.saveToFileSystem();
     }
 }

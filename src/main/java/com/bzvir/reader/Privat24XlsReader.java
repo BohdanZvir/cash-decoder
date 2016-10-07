@@ -103,7 +103,6 @@ public class Privat24XlsReader implements Reader {
                     Row newRow = getNewRow();
                     mapEventOnRow(e, newRow);
                 });
-        updateWorkbook();
     }
 
     private LocalDateTime readDateTime(Event event) {
@@ -113,9 +112,14 @@ public class Privat24XlsReader implements Reader {
     }
 
     private LocalDateTime readDateTime(String date, String time) {
-        String text = Objects.requireNonNull(date) + '|';
+        String text = Objects.requireNonNull(date);
+
         String datePattern = "dd.MM.yyyy|HH:mm";
-        text += (isNullOrEmpty(time)) ? "00:00" : time;
+        if (text.matches("^\\d{4}-\\d{2}-\\d{2}")) {
+            datePattern = "yyyy-MM-dd|HH:mm";
+        }
+
+        text += (isNullOrEmpty(time)) ? "|00:00" : '|' + time;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern);
         return LocalDateTime.parse(text, formatter);
