@@ -132,13 +132,18 @@ public class Privat24XlsReader implements Reader {
     }
 
     Row mapEventOnRow(Event event, Row row) {
-        for (int i = 0; i < getTitles().size(); i++) {
-            List<String> titles = new ArrayList<>(getTitles());
-            Object cellValue = event.getProperty(titles.get(i));
-            if (i == 2) { // resolve Category
-                cellValue = event.getCategory();
+        List<String> titles = new ArrayList<>(getTitles());
+        for (int i = 0; i < titles.size(); i++) {
+            String title = titles.get(i);
+            Object cellValue = event.getProperty(title);
+//            if (i == 2) { // resolve Category
+//                cellValue = event.getCategory();
+//            }
+            String value = "";
+            if (cellValue instanceof Number || cellValue instanceof String) {
+                value = cellValue.toString();
             }
-            createCell(row, i, cellValue instanceof String ? (String) cellValue : "");
+            createCell(row, i, value);
         }
         return row;
     }
