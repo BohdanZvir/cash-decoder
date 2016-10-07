@@ -101,7 +101,7 @@ public class Privat24XlsReader implements Reader {
         events.stream().sorted(increaseDateTime).forEach(e ->
                 {
                     Row newRow = getNewRow();
-                    mapToRow(e, newRow);
+                    mapEventOnRow(e, newRow);
                 });
         updateWorkbook();
     }
@@ -127,7 +127,7 @@ public class Privat24XlsReader implements Reader {
         return sheet.createRow(lastRowToShift);
     }
 
-    Row mapToRow(Event event, Row row) {
+    Row mapEventOnRow(Event event, Row row) {
         for (int i = 0; i < getTitles().size(); i++) {
             List<String> titles = new ArrayList<>(getTitles());
             Object cellValue = event.getProperty(titles.get(i));
