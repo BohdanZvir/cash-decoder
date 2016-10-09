@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bzvir.util.EventMapper.groupByCategory;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Created by bohdan.
@@ -83,7 +84,7 @@ public class CashReader implements Reader {
 
     Event constructEvent(Account account, Transaction transaction) {
         Event event = new Event();
-        event.setProperty("Категорія", account.getName());
+        event.setProperty("Категорія", removeCategoryPrefix(account.getName()));
         event.setProperty("Дата", transaction.getDate());
         event.setProperty("Час", "");
         event.setProperty("Сума у валюті картки", transaction.getAmount());
@@ -91,6 +92,15 @@ public class CashReader implements Reader {
         event.setProperty("Валюта картки", account.getCurrencyId());
         event.setProperty("accountId", account.getId());
         return event;
+    }
+
+    private String removeCategoryPrefix(String category) {
+        if (isNullOrEmpty(category)) {
+            return "";
+        } else if (category.startsWith("@string/")) {
+            return category.replace("@string/", "");
+        }
+        return category;
     }
 
     private Account getExpenseAccount() {

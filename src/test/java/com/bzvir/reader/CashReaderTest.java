@@ -61,6 +61,16 @@ public class CashReaderTest extends AbstractTest {
     }
 
     @Test
+    public void fixedCategoryDueCreatingEvent() {
+        Account account = dummyAccount("cash", "@string/foodstaff");
+        Transaction transaction = dummyTransaction("cash", "");
+
+        Event event = reader.constructEvent(account, transaction);
+
+        assertThat("foodstaff", is(event.getProperty("Категорія")));
+    }
+
+    @Test
     public void sizeLoadedEventsFromCash() {
         List<Event> events = reader.loadData();
 
