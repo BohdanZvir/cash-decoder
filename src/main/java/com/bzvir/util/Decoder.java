@@ -59,14 +59,18 @@ public class Decoder {
         ClassGenerator generator = new ClassGenerator();
 //        Class loadedClass = generator.generateClassDeclarations(dataFilePath);
 
+        boolean cashIsSource = true;
+        if (args[0] == null || "p24".equalsIgnoreCase(args[0])) {
+            cashIsSource = false;
+        }
 
-        new Decoder().doWork();
+        new Decoder().doWork(cashIsSource);
     }
 
-    public void doWork() {
+    public void doWork(boolean cashIsSource) {
         Reader source;
         Reader target;
-        if (/*source is cash == */true) {
+        if (cashIsSource) {
             source = ReaderFactory.createCashReader();
             target = ReaderFactory.createP24Reader();
         } else {
