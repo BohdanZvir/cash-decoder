@@ -88,6 +88,7 @@ public class AbstractTest {
     protected Event dummyEvent(String category, String data, String time, String description) {
         Event event = new Event();
         event.setCategory(category);
+        event.setProperty("Категорія", category);
         event.setProperty("Дата", data);
         event.setProperty("Час", time);
         event.setProperty("Сума у валюті картки", 10.0);

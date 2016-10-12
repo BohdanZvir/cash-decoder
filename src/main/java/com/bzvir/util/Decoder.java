@@ -59,8 +59,7 @@ public class Decoder {
         options.addOption("help", false, "display help");
         options.addOption("p24", false, "use Privat24 xls file as source");
 
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args);
+        CommandLine cmd = new DefaultParser().parse(options, args);
 
         boolean cashAsSource;
 
