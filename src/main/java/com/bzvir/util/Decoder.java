@@ -6,6 +6,7 @@ import com.bzvir.reader.Reader;
 import com.bzvir.reader.ReaderFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.cli.*;
 import org.unsynchronized.jdeserialize;
 
 import java.io.IOException;
@@ -53,18 +54,33 @@ public class Decoder {
 
     }
 
-    public static void main(String[] args) {
-//        jDeserial(dirPath + "settings.dat");
-//        String dataFilePath = dirPath + "settings.dat";
-        ClassGenerator generator = new ClassGenerator();
-//        Class loadedClass = generator.generateClassDeclarations(dataFilePath);
+    public static void main(String[] args) throws ParseException {
+        Options options = new Options();
+        options.addOption("help", false, "display help");
+        options.addOption("p24", false, "use Privat24 xls file as source");
 
-        boolean cashIsSource = true;
-        if (args[0] == null || "p24".equalsIgnoreCase(args[0])) {
-            cashIsSource = false;
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+
+        if(cmd.hasOption("help")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("cash-with-p24", options);
+        } else if(cmd.hasOption("p24")) {
+            boolean cashIsSource = false;
+            new Decoder().doWork(cashIsSource);
+        } else {
+            System.out.println("There are no args!!");
         }
 
-        new Decoder().doWork(cashIsSource);
+
+
+
+
+//        jDeserial(dirPath + "settings.dat");
+//        String dataFilePath = dirPath + "settings.dat";
+//        ClassGenerator generator = new ClassGenerator();
+//        Class loadedClass = generator.generateClassDeclarations(dataFilePath);
+
     }
 
     public void doWork(boolean cashIsSource) {

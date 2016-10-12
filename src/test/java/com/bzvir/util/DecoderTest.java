@@ -1,36 +1,44 @@
 package com.bzvir.util;
 
-import com.bzvir.model.Event;
-import org.junit.Before;
+import org.apache.commons.cli.ParseException;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.text.IsEmptyString.isEmptyString;
 
 /**
  * Created by bohdan.
  */
 public class DecoderTest extends AbstractTest {
 
-    private Decoder decoder;
+//    private Decoder decoder;
+    private ConsoleOutputCapturer capturer;
 
-    @Before
-    public void setup() {
-        decoder = new Decoder();
+    private void captureConsoleOutput() {
+        capturer = new ConsoleOutputCapturer();
+        capturer.start(true);
+    }
+
+    private String getCapturedConsoleOutput() {
+        return capturer.stop();
     }
 //
-//    @Test
-//    public void readP24Events() {
-//        List<Event> p24 = decoder.readP24();
-//        assertThat(p24, not(empty()));
-//    }
-//
-//    @Test
-//    public void readCashEvents() {
-//        List<Event> cash = decoder.readCash();
-//        assertThat(cash, not(empty()));
+//    @Before
+//    public void setup() {
+//        decoder = new Decoder();
 //    }
 
+    @Test
+    public void printHelp() throws ParseException {
+        captureConsoleOutput();
+
+        Decoder.main(new String[]{"-help"});
+
+        String output = getCapturedConsoleOutput();
+        assertThat(output, not(isEmptyString()));
+        assertThat(output, containsString("help"));
+        assertThat(output, containsString("cash-with-p24"));
+    }
 }
