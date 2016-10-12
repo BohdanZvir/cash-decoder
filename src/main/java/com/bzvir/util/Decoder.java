@@ -62,17 +62,17 @@ public class Decoder {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
+        boolean cashAsSource;
+
         if(cmd.hasOption("help")) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("cash-with-p24", options);
-        } else if(cmd.hasOption("p24")) {
-            boolean cashIsSource = false;
-            new Decoder().doWork(cashIsSource);
+            return;
         } else {
-            System.out.println("There are no args!!");
+            cashAsSource = !cmd.hasOption("p24");
         }
 
-
+        new Decoder().doWork(cashAsSource);
 
 
 
