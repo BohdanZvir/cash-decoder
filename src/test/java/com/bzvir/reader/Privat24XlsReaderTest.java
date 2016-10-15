@@ -139,6 +139,6 @@ public class Privat24XlsReaderTest extends AbstractTest {
         assertEquals("19:43", actual_2.getCell(1).getStringCellValue());
         Row actual_3 = rows.getAllValues().get(2);
         assertEquals("19:45", actual_3.getCell(1).getStringCellValue());
-
     }
+
 }
