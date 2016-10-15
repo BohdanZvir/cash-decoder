@@ -12,7 +12,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class Decoder {
 
-    public static final String APPLICATION_NAME = "cash-with-p24";
+    private static final String APPLICATION_NAME = "cash-with-p24";
 
     public static void main(String[] args) throws ParseException {
         Options options = loadOptions();
@@ -25,7 +25,7 @@ public class Decoder {
             formatter.printHelp(APPLICATION_NAME, options);
             
         } else if (cmd.hasOption("generate")) {
-            String[] values = fixGeneratedArgs(cmd.getOptionValues("generate"));
+            String[] values = fixGenerateClassesArgs(cmd.getOptionValues("generate"));
             decoder.generateClasses(values[0], values[1]);
             
         } else {
@@ -42,7 +42,7 @@ public class Decoder {
         return options;
     }
 
-    private static String[] fixGeneratedArgs(String[] args) {
+    private static String[] fixGenerateClassesArgs(String[] args) {
         if (args == null || args.length == 0) {
             throw new RuntimeException("There are no source and no target path");
         } else if (args.length == 1) {
@@ -63,7 +63,7 @@ public class Decoder {
         generator.constructClasses(source, new File(target));
     }
 
-    public void combineCashP24(boolean cashIsSource) {
+    private void combineCashP24(boolean cashIsSource) {
         Reader source;
         Reader target;
         if (cashIsSource) {
