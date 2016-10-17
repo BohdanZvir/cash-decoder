@@ -18,7 +18,7 @@ public class DecoderTest extends AbstractTest {
 
     private void captureConsoleOutput() {
         capturer = new ConsoleOutputCapturer();
-        capturer.start(true);
+        capturer.start(false);
     }
 
     private String getCapturedConsoleOutput() {
