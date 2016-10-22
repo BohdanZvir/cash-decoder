@@ -1,7 +1,7 @@
-package com.bzvir.util;
+package com.bzvir.generator;
 
-/**
- * Created by bohdan.
+/*
+  Created by bohdan.
  */
 
 import org.hamcrest.Description;

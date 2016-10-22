@@ -1,4 +1,4 @@
-package com.bzvir.reader;
+package com.bzvir;
 
 import com.bzvir.model.Event;
 

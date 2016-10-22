@@ -1,4 +1,4 @@
-package com.bzvir.util;
+package com.bzvir;
 
 import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
@@ -6,6 +6,7 @@ import com.burtyka.cash.core.TransactionManager;
 import com.bzvir.model.Event;
 import com.bzvir.reader.CashReader;
 import com.bzvir.report.ShortReporter;
+import com.bzvir.util.FileUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

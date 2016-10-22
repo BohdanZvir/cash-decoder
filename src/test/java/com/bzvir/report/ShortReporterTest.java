@@ -2,7 +2,7 @@ package com.bzvir.report;
 
 import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.TransactionManager;
-import com.bzvir.util.AbstractTest;
+import com.bzvir.AbstractTest;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;

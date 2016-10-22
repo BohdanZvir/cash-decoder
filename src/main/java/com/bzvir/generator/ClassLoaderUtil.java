@@ -1,4 +1,4 @@
-package com.bzvir.util;
+package com.bzvir.generator;
 
 import org.abstractmeta.toolbox.compilation.compiler.JavaSourceCompiler;
 import org.abstractmeta.toolbox.compilation.compiler.impl.JavaSourceCompilerImpl;

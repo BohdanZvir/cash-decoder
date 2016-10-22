@@ -1,7 +1,7 @@
 package com.bzvir.reader;
 
 import com.bzvir.model.Event;
-import com.bzvir.util.AbstractTest;
+import com.bzvir.AbstractTest;
 import com.bzvir.util.FileUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;

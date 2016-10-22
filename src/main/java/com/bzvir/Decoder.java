@@ -1,8 +1,7 @@
-package com.bzvir.util;
+package com.bzvir;
 
 import com.bzvir.model.Event;
-import com.bzvir.reader.Reader;
-import com.bzvir.reader.ReaderFactory;
+import com.bzvir.generator.ClassGenerator;
 import org.apache.commons.cli.*;
 
 import java.io.File;

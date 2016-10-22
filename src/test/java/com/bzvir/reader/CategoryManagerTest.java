@@ -1,6 +1,7 @@
-package com.bzvir.util;
+package com.bzvir.reader;
 
 import com.bzvir.model.Event;
+import com.bzvir.AbstractTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.bzvir.util.CategoryManager.groupByCategory;
+import static com.bzvir.reader.CategoryManager.groupByCategory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;

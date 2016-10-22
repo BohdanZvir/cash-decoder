@@ -1,5 +1,6 @@
-package com.bzvir.util;
+package com.bzvir;
 
+import com.bzvir.util.ConsoleOutputCapturer;
 import org.apache.commons.cli.ParseException;
 import org.junit.Test;
 

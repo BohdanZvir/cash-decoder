@@ -1,14 +1,14 @@
 package com.bzvir.reader;
 
 import com.burtyka.cash.core.*;
+import com.bzvir.Reader;
 import com.bzvir.model.Event;
-import com.bzvir.util.CategoryManager;
 import com.bzvir.util.FileUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bzvir.util.CategoryManager.groupByCategory;
+import static com.bzvir.reader.CategoryManager.groupByCategory;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**

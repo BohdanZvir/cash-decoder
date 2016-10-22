@@ -1,6 +1,7 @@
-package com.bzvir.util;
+package com.bzvir.reader;
 
 import com.bzvir.model.Event;
+import com.bzvir.util.FileUtil;
 
 import java.net.URL;
 import java.util.*;

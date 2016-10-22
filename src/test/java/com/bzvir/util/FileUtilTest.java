@@ -1,6 +1,7 @@
 package com.bzvir.util;
 
 import com.burtyka.cash.core.Account;
+import com.bzvir.AbstractTest;
 import org.junit.Before;
 import org.junit.Test;
 

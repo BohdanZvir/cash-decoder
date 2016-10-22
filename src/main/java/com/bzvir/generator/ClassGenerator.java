@@ -1,5 +1,6 @@
-package com.bzvir.util;
+package com.bzvir.generator;
 
+import com.bzvir.util.ConsoleOutputCapturer;
 import org.unsynchronized.jdeserialize;
 
 import java.io.File;
@@ -9,7 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by bohdan on 19.06.16.
+ * Created by bohdan.
  */
 public class ClassGenerator {
 
@@ -37,8 +38,7 @@ public class ClassGenerator {
 
     private String readClassDeclarations(List<String> args) {
         ConsoleOutputCapturer capturer = new ConsoleOutputCapturer();
-        boolean alsoWriteIntoConsole = false;
-        capturer.start(alsoWriteIntoConsole);
+        capturer.start(false); //not write into console
         jdeserialize.main(args.toArray(new String[]{}));
         String textLine = capturer.stop();
         if (textLine == null || textLine.isEmpty()) {
@@ -70,15 +70,13 @@ public class ClassGenerator {
                 File file = new File(pathToSave, canonicalName.replace(".", File.separator) + ".java");
                 String packageName = extractPackageName(canonicalName);
 
-                StringBuilder sb = new StringBuilder();
-                sb
-                        .append("package ").append(packageName).append(";\n\n")
-                        .append("@lombok.Getter\n" +
-                                "@lombok.Setter\n" +
-                                "@lombok.ToString\n" +
-                                "@lombok.EqualsAndHashCode\n")
-                        .append("public ").append(str.replaceFirst(packageName + ".", "")).append("\n");
-                list.add(sb.toString());
+                String sb = "package " + packageName + ";\n\n" +
+                        "@lombok.Getter\n" +
+                        "@lombok.Setter\n" +
+                        "@lombok.ToString\n" +
+                        "@lombok.EqualsAndHashCode\n" +
+                        "public " + str.replaceFirst(packageName + ".", "") + "\n";
+                list.add(sb);
                 collect.put(file, list);
             } else if (!list.isEmpty() && !str.isEmpty()) {
                 list.add(str + "\n");

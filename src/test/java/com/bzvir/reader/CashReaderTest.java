@@ -4,7 +4,7 @@ import com.burtyka.cash.core.Account;
 import com.burtyka.cash.core.Transaction;
 import com.burtyka.cash.core.TransactionManager;
 import com.bzvir.model.Event;
-import com.bzvir.util.AbstractTest;
+import com.bzvir.AbstractTest;
 import com.bzvir.util.FileUtil;
 import org.junit.Before;
 import org.junit.Test;

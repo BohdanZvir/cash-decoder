@@ -1,4 +1,4 @@
-package com.bzvir.util;
+package com.bzvir.generator;
 
 import org.junit.Test;
 
@@ -7,7 +7,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
 /**
- * Created by bohdan on 15.07.16.
+ * Created by bohdan.
  */
 public class ClassLoaderUtilTest {
 

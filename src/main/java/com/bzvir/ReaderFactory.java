@@ -1,8 +1,7 @@
-package com.bzvir.reader;
+package com.bzvir;
 
 import com.bzvir.reader.CashReader;
 import com.bzvir.reader.Privat24XlsReader;
-import com.bzvir.reader.Reader;
 import com.bzvir.util.FileUtil;
 
 import java.util.ResourceBundle;
