@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.bzvir.util.EventMapper.groupByCategory;
+import static com.bzvir.util.CategoryManager.groupByCategory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -18,20 +18,20 @@ import static org.mockito.Mockito.*;
 /**
  * Created by bohdan.
  */
-public class EventsMapperTest extends AbstractTest {
+public class CategoryManagerTest extends AbstractTest {
 
-    private EventMapper mapper;
+    private CategoryManager manager;
 
     @Before
     public void setUp() {
-        mapper = new EventMapper();
+        manager = new CategoryManager();
     }
 
     @Test
     public void categoryChangedForP24Event() {
         String p24 = "Перекази";
 
-        String actual = mapper.mapCategoryToCash(p24);
+        String actual = manager.mapCategoryToCash(p24);
 
         assertThat(actual, is("transfers"));
     }
@@ -40,7 +40,7 @@ public class EventsMapperTest extends AbstractTest {
     public void anotherCategoryChangedForP24Event() {
         String p24 = "Оренда";
 
-        String actual = mapper.mapCategoryToCash(p24);
+        String actual = manager.mapCategoryToCash(p24);
 
         assertThat(actual, is("rent"));
     }
@@ -82,7 +82,7 @@ public class EventsMapperTest extends AbstractTest {
     @Test
     public void nonExistingCategoryAddedToCsvFile() {
         String newCategory = "newUnderExpense";
-        EventMapper spy = spy(mapper);
+        CategoryManager spy = spy(manager);
         doNothing().when(spy).addCategoryToCsv(newCategory);
 
         spy.mapCategoryToCash(newCategory);

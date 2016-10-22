@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 /**
  * Created by bohdan.
  */
-public class EventMapper {
+public class CategoryManager {
 
     private FileUtil fileUtil;
     private Map<String, String> categoryMap;
 
-    public EventMapper(){
+    public CategoryManager(){
         fileUtil = new FileUtil();
         categoryMap = loadCategoryMap();
     }

@@ -2,13 +2,13 @@ package com.bzvir.reader;
 
 import com.burtyka.cash.core.*;
 import com.bzvir.model.Event;
-import com.bzvir.util.EventMapper;
+import com.bzvir.util.CategoryManager;
 import com.bzvir.util.FileUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.bzvir.util.EventMapper.groupByCategory;
+import static com.bzvir.util.CategoryManager.groupByCategory;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
@@ -209,7 +209,7 @@ public class CashReader implements Reader {
     }
 
     String mapCategory(String category) {
-        return new EventMapper().mapCategoryToCash(category);
+        return new CategoryManager().mapCategoryToCash(category);
     }
 
     private void updateExpenseAccount(Account newAccount) {
