@@ -1,6 +1,5 @@
 package com.bzvir.util;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 
 import javax.annotation.PreDestroy;
@@ -8,7 +7,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 public abstract class Pool<T> {
 
     private static final int INIT_DELAY = 20;
@@ -28,7 +26,7 @@ public abstract class Pool<T> {
 
         this.executorService = executorService;
         this.executorService.scheduleWithFixedDelay(() -> {
-            log.info("== Execute pool check ==");
+            System.out.println("== Execute pool check ==");
             cleanObjects();
             int size = pool.size();
             if (size < minIdle) {
