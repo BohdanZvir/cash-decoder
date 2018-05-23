@@ -1,6 +1,5 @@
 package com.bzvir.util;
 
-import com.riverrock.digitdestr.common.enums.pricerobot.ProductType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
@@ -99,9 +98,5 @@ public interface WebDriverHandler {
     void addCookie(Cookie singleSignOnCookie);
 
     void refreshPage();
-
-    void setProductType(ProductType page);
-
-    boolean isOnThePage(ProductType page);
 
 }
